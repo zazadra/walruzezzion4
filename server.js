@@ -115,18 +115,240 @@ async function generateAgentResponse(agentKey, memories, prompt) {
 
 function generateFallback(agentKey, memories) {
   const count = memories.length;
+  
+  // Parse predictions & reactions to detect patterns
+  const predictions = [];
+  const reactions = [];
+  const hotTakes = [];
+  
+  memories.forEach(m => {
+    const text = m.text || '';
+    if (text.includes('[PREDICTION')) {
+      const matchMatch = text.match(/Match:\s*([^|]+)/);
+      const pickMatch = text.match(/Picked:\s*([^|]+)/);
+      const matchStr = matchMatch ? matchMatch[1].trim() : 'a match';
+      const pickStr = pickMatch ? pickMatch[1].trim() : '';
+      predictions.push({ match: matchStr, pick: pickStr, text });
+    } else if (text.includes('[REACTION')) {
+      reactions.push(text);
+    } else if (text.includes('[HOT TAKE')) {
+      hotTakes.push(text);
+    }
+  });
+
   if (agentKey === 'optimist') {
-    if (count === 0) return "First session! Tell me everything — I believe in you already. 🌟";
-    return `You've made ${count} predictions! Some were a bit… optimistic, but your passion is undeniable. Optimism Score: Unbreakable Spirit 8/10.`;
+    if (count === 0) {
+      return "Welcome to the War Room! 🌟 I am The Believer, and I cannot wait to see your predictions! Go ahead and log your first match pick — I am sure your instincts are spot on!";
+    }
+    
+    let text = `Hey there, passion-fueled fan! 🌟 We've got ${count} memories stored on Walrus Mainnet. `;
+    if (predictions.length > 0) {
+      const lastPred = predictions[predictions.length - 1];
+      text += `I love your confidence in picking ${lastPred.pick || 'your team'} for the ${lastPred.match} game! You always back your teams with such pure enthusiasm. `;
+    }
+    if (reactions.length > 0) {
+      text += `Even when results don't go our way, you keep the faith. `;
+    }
+    
+    const scoreVal = Math.min(10, 6 + Math.ceil(predictions.length / 2));
+    text += `\n\nOptimism Score: Glass Half Full ${scoreVal}/10`;
+    return text;
   }
+  
   if (agentKey === 'skeptic') {
-    if (count === 0) return "First session. I'm watching. I'm always watching. 🧊";
-    return `${count} predictions on file. Your track record suggests more hope than analysis. Credibility Score: Enthusiastic Amateur 4/10.`;
+    if (count === 0) {
+      return "The Realist here. 🧊 I'm watching. You have zero predictions logged, which is probably smart, because once you commit to paper, I'll dismantle your logic piece by piece.";
+    }
+    
+    let text = `Oh boy, here we go. 🧊 I reviewed your ${count} memories. `;
+    if (predictions.length > 0) {
+      const firstPred = predictions[0];
+      const lastPred = predictions[predictions.length - 1];
+      text += `Remember when you claimed "${firstPred.pick}" for ${firstPred.match}? `;
+      if (predictions.length > 1) {
+        text += `And now you're jumping on ${lastPred.pick || 'another team'} for ${lastPred.match}. `;
+      }
+      text += `It's fascinating how confidence scales inversely with actual results. `;
+    }
+    if (hotTakes.length > 0) {
+      text += `Your hot takes are like milk in the sun — souring within 24 hours. `;
+    }
+    
+    const credVal = Math.max(1, 9 - Math.ceil(predictions.length / 2));
+    text += `\n\nCredibility Score: Wishful Thinking ${credVal}/10`;
+    return text;
   }
-  if (count === 0) return "No prediction history yet. Build up a record and I'll tell you exactly who you are as a fan.";
-  const predictions = memories.filter(m => m.type === 'prediction' || m.text?.includes('PREDICTION'));
-  return `Fan Archetype: The Eternal Optimist. ${predictions.length} predictions logged. Pattern detected: consistently overestimates your preferred team's abilities while underestimating tactical deficiencies.`;
+  
+  if (count === 0) {
+    return "No profile available. I need at least one prediction or reaction logged in Walrus Memory to parse your psychological fan archetype.";
+  }
+  
+  let text = `Fan Profile Dossier (Offline Parser):\n`;
+  text += `This user has accumulated ${count} tournament memories. Analysis indicates a strong tendency to `;
+  if (predictions.length > 2) {
+    text += `consistently back heavy favorites while reacting with shock and denial when upsets occur. `;
+  } else {
+    text += `formulate strong opinions on matches early in the tournament. `;
+  }
+  
+  if (hotTakes.length > 0) {
+    text += `They exhibit a high frequency of emotional 'hot takes' which are quickly contradicted by subsequent match reactions. `;
+  }
+  
+  text += `\n\nFan Archetype: The Hopeless Romantic`;
+  return text;
 }
+
+const fallbackMatches = [
+  {
+    id: "760415",
+    date: "2026-06-11T19:00Z",
+    name: "South Africa at Mexico",
+    shortName: "RSA @ MEX",
+    status: "STATUS_SCHEDULED",
+    state: "pre",
+    statusDetail: "Thu, June 11th at 3:00 PM EDT",
+    home: { name: "Mexico", shortName: "MEX", logo: "https://a.espncdn.com/i/teamlogos/countries/500/mex.png", score: "0" },
+    away: { name: "South Africa", shortName: "RSA", logo: "https://a.espncdn.com/i/teamlogos/countries/500/rsa.png", score: "0" }
+  },
+  {
+    id: "760416",
+    date: "2026-06-12T16:00Z",
+    name: "Canada vs Morocco",
+    shortName: "CAN vs MAR",
+    status: "STATUS_SCHEDULED",
+    state: "pre",
+    statusDetail: "Fri, June 12th at 12:00 PM EDT",
+    home: { name: "Canada", shortName: "CAN", logo: "https://a.espncdn.com/i/teamlogos/countries/500/can.png", score: "0" },
+    away: { name: "Morocco", shortName: "MAR", logo: "https://a.espncdn.com/i/teamlogos/countries/500/mar.png", score: "0" }
+  },
+  {
+    id: "760417",
+    date: "2026-06-12T20:00Z",
+    name: "United States vs Spain",
+    shortName: "USA vs ESP",
+    status: "STATUS_SCHEDULED",
+    state: "pre",
+    statusDetail: "Fri, June 12th at 4:00 PM EDT",
+    home: { name: "United States", shortName: "USA", logo: "https://a.espncdn.com/i/teamlogos/countries/500/usa.png", score: "0" },
+    away: { name: "Spain", shortName: "ESP", logo: "https://a.espncdn.com/i/teamlogos/countries/500/esp.png", score: "0" }
+  },
+  {
+    id: "760418",
+    date: "2026-06-13T15:00Z",
+    name: "Argentina vs Saudi Arabia",
+    shortName: "ARG vs KSA",
+    status: "STATUS_SCHEDULED",
+    state: "pre",
+    statusDetail: "Sat, June 13th at 11:00 AM EDT",
+    home: { name: "Argentina", shortName: "ARG", logo: "https://a.espncdn.com/i/teamlogos/countries/500/arg.png", score: "0" },
+    away: { name: "Saudi Arabia", shortName: "KSA", logo: "https://a.espncdn.com/i/teamlogos/countries/500/ksa.png", score: "0" }
+  },
+  {
+    id: "760419",
+    date: "2026-06-13T19:00Z",
+    name: "Brazil vs Serbia",
+    shortName: "BRA vs SRB",
+    status: "STATUS_SCHEDULED",
+    state: "pre",
+    statusDetail: "Sat, June 13th at 3:00 PM EDT",
+    home: { name: "Brazil", shortName: "BRA", logo: "https://a.espncdn.com/i/teamlogos/countries/500/bra.png", score: "0" },
+    away: { name: "Serbia", shortName: "SRB", logo: "https://a.espncdn.com/i/teamlogos/countries/500/srb.png", score: "0" }
+  },
+  {
+    id: "760420",
+    date: "2026-06-14T18:00Z",
+    name: "France vs Australia",
+    shortName: "FRA vs AUS",
+    status: "STATUS_SCHEDULED",
+    state: "pre",
+    statusDetail: "Sun, June 14th at 2:00 PM EDT",
+    home: { name: "France", shortName: "FRA", logo: "https://a.espncdn.com/i/teamlogos/countries/500/fra.png", score: "0" },
+    away: { name: "Australia", shortName: "AUS", logo: "https://a.espncdn.com/i/teamlogos/countries/500/aus.png", score: "0" }
+  },
+  {
+    id: "760421",
+    date: "2026-06-15T17:00Z",
+    name: "Germany vs Japan",
+    shortName: "GER vs JPN",
+    status: "STATUS_SCHEDULED",
+    state: "pre",
+    statusDetail: "Mon, June 15th at 1:00 PM EDT",
+    home: { name: "Germany", shortName: "GER", logo: "https://a.espncdn.com/i/teamlogos/countries/500/ger.png", score: "0" },
+    away: { name: "Japan", shortName: "JPN", logo: "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png", score: "0" }
+  },
+  {
+    id: "760422",
+    date: "2026-06-15T21:00Z",
+    name: "England vs Iran",
+    shortName: "ENG vs IRN",
+    status: "STATUS_SCHEDULED",
+    state: "pre",
+    statusDetail: "Mon, June 15th at 5:00 PM EDT",
+    home: { name: "England", shortName: "ENG", logo: "https://a.espncdn.com/i/teamlogos/countries/500/eng.png", score: "0" },
+    away: { name: "Iran", shortName: "IRN", logo: "https://a.espncdn.com/i/teamlogos/countries/500/irn.png", score: "0" }
+  }
+];
+
+let cachedMatches = null;
+let lastCacheTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+app.get('/api/matches', async (req, res) => {
+  const now = Date.now();
+  if (cachedMatches && (now - lastCacheTime < CACHE_DURATION)) {
+    return res.json({ matches: cachedMatches, source: 'cache' });
+  }
+
+  try {
+    const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260719&limit=150');
+    if (!response.ok) {
+      throw new Error(`ESPN API returned status ${response.status}`);
+    }
+    const data = await response.json();
+    const events = data.events || [];
+    
+    if (events.length === 0) {
+      throw new Error('No events returned from ESPN scoreboard');
+    }
+
+    const mapped = events.map(e => {
+      const comp = e.competitions?.[0] || {};
+      const competitors = comp.competitors || [];
+      const home = competitors.find(c => c.homeAway === 'home') || {};
+      const away = competitors.find(c => c.homeAway === 'away') || {};
+      
+      return {
+        id: e.id,
+        date: e.date,
+        name: e.name,
+        shortName: e.shortName,
+        status: comp.status?.type?.name || 'STATUS_SCHEDULED',
+        state: comp.status?.type?.state || 'pre',
+        statusDetail: comp.status?.type?.detail || 'Scheduled',
+        home: {
+          name: home.team?.displayName || 'TBD',
+          shortName: home.team?.abbreviation || 'TBD',
+          logo: home.team?.logo || 'https://a.espncdn.com/i/teamlogos/countries/500/default-flag.png',
+          score: home.score || '0'
+        },
+        away: {
+          name: away.team?.displayName || 'TBD',
+          shortName: away.team?.abbreviation || 'TBD',
+          logo: away.team?.logo || 'https://a.espncdn.com/i/teamlogos/countries/500/default-flag.png',
+          score: away.score || '0'
+        }
+      };
+    });
+
+    cachedMatches = mapped;
+    lastCacheTime = now;
+    res.json({ matches: mapped, source: 'live' });
+  } catch (err) {
+    console.warn('Error fetching World Cup matches from ESPN:', err.message);
+    res.json({ matches: fallbackMatches, source: 'fallback', error: err.message });
+  }
+});
 
 // ─── ROUTES ───────────────────────────────────────────────────────────────────
 
