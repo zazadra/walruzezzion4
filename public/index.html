@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Walruzezzion4 | FIFA World Cup 2026 AI War Room</title>
+  <meta name="description" content="Walruzezzion4 — a multi-agent AI War Room that remembers your World Cup predictions across the entire tournament. Powered by Walrus Memory on Mainnet.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════════════════════════════════════════════
+       RESET & TOKENS
+    ══════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* Palette */
+      --midnight: #050c07;
+      --pitch: #0a1f10;
+      --pitch-2: #0f2d18;
+      --turf: #1a4d2e;
+      --emerald: #00c951;
+      --emerald-dim: rgba(0,201,81,0.15);
+      --emerald-glow: 0 0 40px rgba(0,201,81,0.3);
+      --amber: #f59e0b;
+      --amber-dim: rgba(245,158,11,0.15);
+      --rose: #f43f5e;
+      --rose-dim: rgba(244,63,94,0.12);
+      --sky: #38bdf8;
+      --sky-dim: rgba(56,189,248,0.12);
+      --purple: #a78bfa;
+      --purple-dim: rgba(167,139,250,0.12);
+      --walrus: linear-gradient(135deg, #2F5CFF 0%, #9249FF 50%, #EEA0FF 100%);
+      
+      /* Surfaces */
+      --surf-0: rgba(255,255,255,0.02);
+      --surf-1: rgba(255,255,255,0.04);
+      --surf-2: rgba(255,255,255,0.07);
+      --surf-3: rgba(255,255,255,0.10);
+      --border: rgba(255,255,255,0.07);
+      --border-hi: rgba(255,255,255,0.15);
+      
+      /* Text */
+      --text: #f1f5f0;
+      --text-2: rgba(241,245,240,0.7);
+      --text-3: rgba(241,245,240,0.4);
+      --text-4: rgba(241,245,240,0.2);
+      
+      /* Geometry */
+      --r: 14px;
+      --r-sm: 9px;
+      --r-xs: 6px;
+      --blur: blur(24px);
+      --shadow: 0 24px 64px rgba(0,0,0,0.6);
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--midnight);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* ── BACKGROUND ATMOSPHERE ────────────────────────────────────────── */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bg-layer::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 90% 50% at 50% -5%, rgba(0,201,81,0.10) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 50% at 85% 85%, rgba(59,130,246,0.07) 0%, transparent 45%),
+        radial-gradient(ellipse 40% 40% at 10% 75%, rgba(167,139,250,0.06) 0%, transparent 45%);
+    }
+
+    .bg-layer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,201,81,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,201,81,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    /* ══════════════════════════════════════════════════
+       HEADER
+    ══════════════════════════════════════════════════ */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      background: rgba(5,12,7,0.85);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: var(--walrus);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 16px rgba(139,92,246,0.35);
+    }
+
+    .logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .logo-sub {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      display: block;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: var(--surf-1);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.72rem;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #374151;
+      animation: blink 2s ease infinite;
+    }
+    .status-dot.live { background: var(--emerald); box-shadow: 0 0 6px var(--emerald); }
+    .status-dot.demo { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+    .status-dot.error { background: var(--rose); }
+
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+    /* ══════════════════════════════════════════════════
+       MAIN LAYOUT
+    ══════════════════════════════════════════════════ */
+    .main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 36px 24px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ══════════════════════════════════════════════════
+       HERO
+    ══════════════════════════════════════════════════ */
+    .hero {
+      text-align: center;
+      padding: 48px 0 40px;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      background: var(--surf-1);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 22px;
+    }
+
+    .hero-eyebrow .pill-accent {
+      background: var(--walrus);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+    }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.2rem, 5.5vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1.05;
+      margin-bottom: 18px;
+    }
+
+    .text-green {
+      background: linear-gradient(130deg, var(--emerald) 20%, #00ff87 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 20px rgba(0,201,81,0.4));
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--text-2);
+      max-width: 540px;
+      margin: 0 auto 32px;
+      line-height: 1.65;
+    }
+
+    /* ── STATS BAR ─────────────────────────────────── */
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+
+    .stat-item {
+      padding: 14px 28px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: var(--walrus);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-4);
+      margin-top: 4px;
+    }
+
+    /* ══════════════════════════════════════════════════
+       BEFORE / AFTER DEMO BANNER
+    ══════════════════════════════════════════════════ */
+    .ba-banner {
+      background: var(--surf-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .ba-header {
+      padding: 10px 18px;
+      background: linear-gradient(90deg, rgba(0,201,81,0.08) 0%, rgba(167,139,250,0.08) 100%);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+
+    .ba-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 600px) { .ba-panels { grid-template-columns: 1fr; } }
+
+    .ba-panel {
+      padding: 18px 20px;
+    }
+    .ba-panel:first-child { border-right: 1px solid var(--border); }
+
+    .ba-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-4);
+      margin-bottom: 10px;
+    }
+    .ba-label.after { color: var(--emerald); }
+
+    .ba-bubble {
+      font-size: 0.875rem;
+      line-height: 1.55;
+      color: var(--text-2);
+      background: var(--surf-1);
+      border-radius: var(--r-sm);
+      padding: 12px 14px;
+      border-left: 3px solid transparent;
+    }
+    .ba-bubble.after {
+      border-left-color: var(--emerald);
+      background: rgba(0,201,81,0.04);
+      color: var(--text);
+    }
+    .ba-bubble .q { color: var(--rose); font-style: italic; }
+    .ba-bubble strong { color: var(--text); }
+
+    /* ══════════════════════════════════════════════════
+       GRID LAYOUT
+    ══════════════════════════════════════════════════ */
+    .layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+    .col-left { display: flex; flex-direction: column; gap: 20px; }
+    .col-right { display: flex; flex-direction: column; gap: 20px; }
+
+    /* ══════════════════════════════════════════════════
+       CARD
+    ══════════════════════════════════════════════════ */
+    .card {
+      background: var(--surf-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 22px;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .card:hover { border-color: var(--border-hi); }
+
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title-action {
+      margin-left: auto;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      color: var(--text-4);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 3px 10px;
+      transition: all 0.15s;
+      background: none;
+      font-family: inherit;
+    }
+    .card-title-action:hover { color: var(--text-2); border-color: var(--border-hi); }
+
+    /* ══════════════════════════════════════════════════
+       TYPE TABS
+    ══════════════════════════════════════════════════ */
+    .type-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      margin-bottom: 16px;
+      background: var(--surf-0);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 4px;
+    }
+
+    .type-tab {
+      padding: 8px 6px;
+      text-align: center;
+      font-size: 0.76rem;
+      font-weight: 600;
+      border-radius: 7px;
+      cursor: pointer;
+      color: var(--text-3);
+      transition: all 0.18s;
+      user-select: none;
+    }
+    .type-tab:hover { color: var(--text-2); background: var(--surf-2); }
+    .type-tab.active { background: var(--surf-3); color: var(--text); }
+    .type-tab.active.prediction { background: var(--emerald-dim); color: var(--emerald); }
+    .type-tab.active.hot_take { background: var(--rose-dim); color: var(--rose); }
+    .type-tab.active.reaction { background: var(--sky-dim); color: var(--sky); }
+
+    /* ══════════════════════════════════════════════════
+       FORM
+    ══════════════════════════════════════════════════ */
+    .form-row { margin-bottom: 12px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+
+    label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-3);
+      margin-bottom: 5px;
+    }
+
+    input[type=text], input[type=email], select, textarea {
+      width: 100%;
+      background: var(--surf-0);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--text);
+      padding: 9px 12px;
+      font-size: 0.875rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.18s, background 0.18s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(0,201,81,0.5);
+      background: rgba(0,201,81,0.04);
+    }
+    input::placeholder, textarea::placeholder { color: var(--text-4); }
+    textarea { min-height: 80px; resize: vertical; line-height: 1.5; }
+    select option { background: #0a1f10; }
+
+    /* Confidence */
+    .conf-row { display: flex; align-items: center; gap: 10px; }
+    .conf-row input[type=range] {
+      flex: 1; padding: 0; height: 3px;
+      border: none; border-radius: 3px;
+      background: var(--border);
+      accent-color: var(--emerald);
+      cursor: pointer;
+    }
+    .conf-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--emerald);
+      width: 20px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════════════════════════
+       BUTTONS
+    ══════════════════════════════════════════════════ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 10px 20px;
+      border-radius: var(--r-sm);
+      font-size: 0.875rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      border: none;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--emerald);
+      color: #040d06;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+    .btn-primary:hover { background: #00ff87; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,201,81,0.35); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-debate {
+      background: linear-gradient(135deg, rgba(244,63,94,0.9) 0%, rgba(167,139,250,0.9) 100%);
+      color: #fff;
+      width: 100%;
+      font-size: 0.95rem;
+      padding: 12px;
+    }
+    .btn-debate:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(167,139,250,0.4); }
+
+    .btn-profile {
+      background: var(--purple-dim);
+      border: 1px solid rgba(167,139,250,0.25);
+      color: var(--purple);
+      width: 100%;
+    }
+    .btn-profile:hover { background: rgba(167,139,250,0.2); }
+
+    .btn-ghost {
+      background: var(--surf-1);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+    }
+    .btn-ghost:hover { background: var(--surf-2); border-color: var(--border-hi); }
+
+    .btn-amber {
+      background: var(--amber-dim);
+      border: 1px solid rgba(245,158,11,0.25);
+      color: var(--amber);
+      font-size: 0.78rem;
+      padding: 7px 14px;
+    }
+    .btn-amber:hover { background: rgba(245,158,11,0.2); }
+
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+    /* ══════════════════════════════════════════════════
+       WAR ROOM — AGENT PANELS
+    ══════════════════════════════════════════════════ */
+    .war-room {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+    }
+
+    .war-room-header {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      background: linear-gradient(90deg, rgba(244,63,94,0.08) 0%, rgba(167,139,250,0.08) 50%, rgba(56,189,248,0.08) 100%);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wr-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      text-align: center;
+    }
+
+    .btn-debate-trigger {
+      background: linear-gradient(135deg, var(--rose), var(--purple));
+      border: none;
+      border-radius: var(--r-xs);
+      color: white;
+      padding: 7px 16px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .btn-debate-trigger:hover { transform: scale(1.04); box-shadow: 0 6px 20px rgba(167,139,250,0.4); }
+    .btn-debate-trigger:disabled { opacity: 0.5; transform: none; }
+
+    .agents-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--surf-0);
+    }
+
+    @media (max-width: 600px) { .agents-grid { grid-template-columns: 1fr; } }
+
+    .agent-panel {
+      padding: 20px;
+    }
+    .agent-panel:first-child { border-right: 1px solid var(--border); }
+
+    .agent-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .agent-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .agent-avatar.optimist {
+      background: rgba(0,201,81,0.15);
+      box-shadow: 0 0 20px rgba(0,201,81,0.2);
+      animation: glowGreen 4s ease-in-out infinite;
+    }
+    .agent-avatar.skeptic {
+      background: rgba(56,189,248,0.12);
+      box-shadow: 0 0 20px rgba(56,189,248,0.15);
+      animation: glowBlue 4s ease-in-out infinite;
+    }
+    @keyframes glowGreen { 0%,100%{box-shadow:0 0 20px rgba(0,201,81,0.2);} 50%{box-shadow:0 0 35px rgba(0,201,81,0.4);} }
+    @keyframes glowBlue { 0%,100%{box-shadow:0 0 20px rgba(56,189,248,0.15);} 50%{box-shadow:0 0 35px rgba(56,189,248,0.3);} }
+
+    .agent-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .agent-name.optimist { color: var(--emerald); }
+    .agent-name.skeptic { color: var(--sky); }
+
+    .agent-role {
+      font-size: 0.68rem;
+      color: var(--text-4);
+      margin-top: 1px;
+    }
+
+    .agent-speech {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: var(--text-2);
+      min-height: 80px;
+      position: relative;
+    }
+
+    .agent-speech.idle { color: var(--text-3); font-style: italic; }
+
+    .speech-score {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 2px 10px;
+      border-radius: var(--r-xs);
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .speech-score.optimist { background: rgba(0,201,81,0.12); color: var(--emerald); }
+    .speech-score.skeptic { background: rgba(56,189,248,0.12); color: var(--sky); }
+
+    /* ══════════════════════════════════════════════════
+       PROFILE CARD
+    ══════════════════════════════════════════════════ */
+    .profile-inner {
+      background: var(--purple-dim);
+      border-radius: var(--r-sm);
+      padding: 16px;
+      min-height: 80px;
+    }
+
+    .profile-text {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: var(--text-2);
+    }
+
+    .profile-text.idle { color: var(--text-3); font-style: italic; }
+
+    .archetype-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 4px 12px;
+      background: rgba(167,139,250,0.15);
+      border: 1px solid rgba(167,139,250,0.3);
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--purple);
+    }
+
+    /* ══════════════════════════════════════════════════
+       TIMELINE
+    ══════════════════════════════════════════════════ */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+    .timeline::-webkit-scrollbar { width: 3px; }
+    .timeline::-webkit-scrollbar-track { background: transparent; }
+    .timeline::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .timeline-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 10px 12px;
+      background: var(--surf-0);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      transition: border-color 0.18s;
+      animation: fadeSlide 0.25s ease;
+    }
+    @keyframes fadeSlide { from{opacity:0;transform:translateY(-6px);} to{opacity:1;transform:none;} }
+    .timeline-item:hover { border-color: var(--border-hi); }
+
+    .ti-icon {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .ti-icon.prediction { background: var(--emerald-dim); }
+    .ti-icon.hot_take { background: var(--rose-dim); }
+    .ti-icon.reaction { background: var(--sky-dim); }
+    .ti-icon.general { background: var(--purple-dim); }
+
+    .ti-body { flex: 1; min-width: 0; }
+
+    .ti-text {
+      font-size: 0.82rem;
+      color: var(--text);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .ti-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 3px;
+      font-size: 0.68rem;
+      color: var(--text-4);
+    }
+
+    .ti-badge {
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .ti-badge.walrus { background: rgba(0,201,81,0.12); color: var(--emerald); }
+    .ti-badge.demo { background: rgba(245,158,11,0.12); color: var(--amber); }
+
+    .tl-empty {
+      text-align: center;
+      padding: 28px;
+      color: var(--text-4);
+      font-size: 0.875rem;
+    }
+    .tl-empty-icon { font-size: 2rem; margin-bottom: 8px; }
+
+    /* ══════════════════════════════════════════════════
+       MEMORY PROOF STRIP
+    ══════════════════════════════════════════════════ */
+    .proof-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: rgba(167,139,250,0.06);
+      border: 1px solid rgba(167,139,250,0.15);
+      border-radius: var(--r-xs);
+      font-size: 0.72rem;
+      color: var(--text-3);
+    }
+    .proof-row a {
+      color: var(--purple);
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      text-decoration: none;
+    }
+    .proof-row a:hover { text-decoration: underline; }
+
+    /* ══════════════════════════════════════════════════
+       DEMO INJECTOR
+    ══════════════════════════════════════════════════ */
+    .injector {
+      background: rgba(245,158,11,0.04);
+      border: 1px dashed rgba(245,158,11,0.2);
+      border-radius: var(--r);
+      padding: 18px 20px;
+    }
+
+    .injector h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--amber);
+      margin-bottom: 4px;
+    }
+    .injector p {
+      font-size: 0.78rem;
+      color: var(--text-3);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .inject-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ══════════════════════════════════════════════════
+       MEMORIES USED FOOTER
+    ══════════════════════════════════════════════════ */
+    .mem-footer {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 0.72rem;
+      color: var(--text-4);
+    }
+    .mem-chip {
+      padding: 2px 8px;
+      background: rgba(167,139,250,0.12);
+      border: 1px solid rgba(167,139,250,0.2);
+      border-radius: 100px;
+      color: var(--purple);
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+
+    /* ══════════════════════════════════════════════════
+       SPINNER
+    ══════════════════════════════════════════════════ */
+    .spin {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: rotate 0.65s linear infinite;
+      display: none;
+    }
+    @keyframes rotate { to { transform: rotate(360deg); } }
+
+    /* ══════════════════════════════════════════════════
+       TOAST
+    ══════════════════════════════════════════════════ */
+    #toasts {
+      position: fixed;
+      bottom: 20px; right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .toast {
+      background: rgba(5,12,7,0.97);
+      backdrop-filter: var(--blur);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 10px 16px;
+      font-size: 0.82rem;
+      color: var(--text);
+      max-width: 300px;
+      animation: toastIn 0.25s ease;
+      box-shadow: var(--shadow);
+    }
+    @keyframes toastIn { from{opacity:0;transform:translateX(16px);} to{opacity:1;transform:none;} }
+    .toast.ok { border-color: rgba(0,201,81,0.35); }
+    .toast.err { border-color: rgba(244,63,94,0.35); }
+    .toast.info { border-color: rgba(167,139,250,0.35); }
+
+    /* ══════════════════════════════════════════════════
+       WALRUS FOOTER
+    ══════════════════════════════════════════════════ */
+    .footer {
+      text-align: center;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--text-4);
+      line-height: 1.8;
+    }
+    .footer a {
+      background: var(--walrus);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div class="bg-layer"></div>
+
+<!-- ══ HEADER ══════════════════════════════════════════════════════════ -->
+<header>
+  <div class="header-wrap">
+    <div class="logo-wrap">
+      <div class="logo-icon">🦭</div>
+      <div>
+        <div class="logo-text">Walruzezzion4</div>
+        <span class="logo-sub">World Cup 2026 · Walrus Memory</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="status-pill" id="status-pill">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Initialising…</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ MAIN ════════════════════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">
+      ⚽ FIFA World Cup 2026 &nbsp;·&nbsp; <span class="pill-accent">Walrus Memory Mainnet</span>
+    </div>
+    <h1>Your Predictions.<br>Their <span class="text-green">Memory.</span></h1>
+    <p class="hero-desc">Two AI agents — The Believer and The Realist — remember every prediction you make. By Day 4 they'll know you better than you know yourself.</p>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label">Memories Stored</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="stat-pred">0</div>
+        <div class="stat-label">Predictions</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="stat-takes">0</div>
+        <div class="stat-label">Hot Takes</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="stat-days">1</div>
+        <div class="stat-label">Day of Tournament</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEFORE / AFTER -->
+  <div class="ba-banner">
+    <div class="ba-header">
+      📼 Memory Evolution &nbsp;·&nbsp; How the agents change as the tournament progresses
+    </div>
+    <div class="ba-panels">
+      <div class="ba-panel">
+        <div class="ba-label before">📅 Day 1 — No Memory</div>
+        <div class="ba-bubble">
+          "Welcome to the War Room. I have no data on you yet. Tell me your first prediction and we begin building your file."
+        </div>
+      </div>
+      <div class="ba-panel">
+        <div class="ba-label after">📅 Day 4+ — Memory Active</div>
+        <div class="ba-bubble after">
+          <strong>The Realist:</strong> On June 14th you declared Brazil would <span class="q">"absolutely demolish everyone 3-0 per game"</span>. They drew 1-1. Then you pivoted to <span class="q">"France are the real deal"</span> — after calling Mbappe overrated 48 hours earlier. <strong>Credibility Score: Hopeful Amnesiac 2/10.</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="layout">
+
+    <!-- ══ LEFT COLUMN ════════════════════════════════════════════════ -->
+    <div class="col-left">
+
+      <!-- INPUT CARD -->
+      <div class="card">
+        <div class="card-title">⚡ Log a Memory</div>
+
+        <div class="type-tabs">
+          <div class="type-tab active prediction" id="tab-prediction" onclick="setType('prediction',this)">🔮 Prediction</div>
+          <div class="type-tab hot_take" id="tab-hot_take" onclick="setType('hot_take',this)">🌶️ Hot Take</div>
+          <div class="type-tab reaction" id="tab-reaction" onclick="setType('reaction',this)">😤 Reaction</div>
+        </div>
+
+        <div id="pred-fields">
+          <div class="form-row-2">
+            <div>
+              <label>Match</label>
+              <input id="match" type="text" placeholder="Brazil vs Serbia">
+            </div>
+            <div>
+              <label>Picking</label>
+              <input id="team" type="text" placeholder="Brazil 2-0">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Confidence</label>
+            <div class="conf-row">
+              <input type="range" id="conf" min="1" max="10" value="7"
+                     oninput="document.getElementById('conf-val').textContent=this.value">
+              <span class="conf-val" id="conf-val">7</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label id="text-lbl">Your prediction</label>
+          <textarea id="input-text" placeholder="Brazil will dominate this group, easily 3 goals per game…"></textarea>
+        </div>
+
+        <button class="btn btn-primary" id="remember-btn" onclick="doRemember()">
+          <div class="spin" id="rem-spin"></div>
+          🧠 Store in Walrus Memory
+        </button>
+
+        <div class="proof-row" id="proof-row" style="display:none;">
+          🔗 On-chain · Job: <a href="#" id="proof-link" target="_blank">—</a>
+          &nbsp;·&nbsp; <a id="explorer-link" href="#" target="_blank">View on Explorer →</a>
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="card">
+        <div class="card-title">
+          📜 Memory Timeline
+          <button class="card-title-action" onclick="loadTimeline()">↻ Refresh</button>
+        </div>
+        <div class="timeline" id="timeline">
+          <div class="tl-empty">
+            <div class="tl-empty-icon">🏟️</div>
+            No memories yet. Make your first prediction!
+          </div>
+        </div>
+      </div>
+
+      <!-- DEMO INJECT -->
+      <div class="injector">
+        <h3>⏩ Simulate Tournament Progression</h3>
+        <p>Inject pre-written past memories to see how the agents evolve their analysis as context builds up.</p>
+        <div class="inject-btns">
+          <button class="btn btn-amber" onclick="injectPhase('day1')">📅 Day 1 Preds</button>
+          <button class="btn btn-amber" onclick="injectPhase('day4')">📅 Day 4 Results</button>
+          <button class="btn btn-amber" onclick="injectPhase('finals')">🏆 Finals Week</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ RIGHT COLUMN ═══════════════════════════════════════════════ -->
+    <div class="col-right">
+
+      <!-- WAR ROOM -->
+      <div class="war-room card" style="padding:0; overflow:hidden;">
+        <div class="war-room-header">
+          <div class="wr-title">🌟 The Believer</div>
+          <button class="btn-debate-trigger" id="debate-btn" onclick="doDebate()">
+            ⚡ Start Debate
+          </button>
+          <div class="wr-title" style="text-align:right;">🧊 The Realist</div>
+        </div>
+
+        <div class="agents-grid">
+          <!-- Optimist -->
+          <div class="agent-panel">
+            <div class="agent-header">
+              <div class="agent-avatar optimist">🌟</div>
+              <div>
+                <div class="agent-name optimist">The Believer</div>
+                <div class="agent-role">Eternal Optimist · AI Pundit</div>
+              </div>
+            </div>
+            <div class="agent-speech idle" id="optimist-speech">
+              *waiting for predictions to analyse…*
+            </div>
+            <div class="mem-footer" id="optimist-mem">
+              🧠 Recalled: <span class="mem-chip" id="opt-count">0 memories</span>
+            </div>
+          </div>
+
+          <!-- Skeptic -->
+          <div class="agent-panel">
+            <div class="agent-header">
+              <div class="agent-avatar skeptic">🧊</div>
+              <div>
+                <div class="agent-name skeptic">The Realist</div>
+                <div class="agent-role">Cold Analyst · AI Pundit</div>
+              </div>
+            </div>
+            <div class="agent-speech idle" id="skeptic-speech">
+              *no data. watching. always watching.*
+            </div>
+            <div class="mem-footer" id="skeptic-mem">
+              🧠 Recalled: <span class="mem-chip" id="skep-count">0 memories</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAN PROFILE -->
+      <div class="card">
+        <div class="card-title">
+          🔍 Fan Profile
+          <button class="card-title-action" id="profile-btn" onclick="doProfile()">
+            Analyse →
+          </button>
+        </div>
+        <div class="profile-inner">
+          <div class="profile-text idle" id="profile-text">
+            Build up a prediction history and The Profiler will construct your psychological football fan profile — identifying biases, blind spots, and patterns you didn't know you had.
+          </div>
+        </div>
+        <div class="mem-footer" id="profile-mem">
+          🧠 Based on: <span class="mem-chip" id="prof-count">0 memories</span>
+        </div>
+      </div>
+
+      <!-- WALRUS MEMORY INFO -->
+      <div class="card" style="border-color: rgba(167,139,250,0.2);">
+        <div class="card-title">🔗 Walrus Memory</div>
+        <div style="font-size:0.82rem; color:var(--text-2); line-height:1.65;">
+          Every prediction, hot take, and reaction you log is stored on <strong style="color:var(--text)">Walrus Mainnet</strong> — a decentralised storage network. Your memories persist across sessions, across browsers, across devices.
+          <br><br>
+          The agents use <code style="font-family:'JetBrains Mono',monospace; color:var(--purple); font-size:0.78rem;">memwal.recall(query)</code> to semantically search your history before each analysis — so on Day 4 they genuinely know things they couldn't have known on Day 1.
+        </div>
+        <div id="account-info" style="display:none; margin-top:12px;">
+          <div class="proof-row">
+            🏦 Account: <a id="account-link" href="#" target="_blank">—</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    Built for <a href="https://mystenlabs.notion.site/Walrus-Session-4-3756d9dcb4e9808ca16fc8c22562e3c6" target="_blank">Walrus Sessions 4</a> &nbsp;·&nbsp;
+    Powered by <a href="https://walrus.xyz/products/walrus-memory" target="_blank">Walrus Memory</a> &nbsp;·&nbsp;
+    <a href="https://docs.wal.app/walrus-memory" target="_blank">Docs</a> &nbsp;·&nbsp;
+    <a href="https://github.com/MystenLabs/MemWal" target="_blank">GitHub</a>
+  </div>
+
+</main>
+
+<!-- TOASTS -->
+<div id="toasts"></div>
+
+<script>
+// ════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════
+let mode = 'demo';
+let memories = [];
+let currentType = 'prediction';
+
+const PHASES = {
+  day1: [
+    { type:'prediction', match:'Brazil vs Serbia',    team:'Brazil 3-0',  confidence:9, text:'Brazil will absolutely demolish Serbia, probably 3-0 at minimum', timestamp: ts(-4) },
+    { type:'hot_take',   text:'Mbappe is massively overrated — he only scores in easy games',                                                                    timestamp: ts(-4.1) },
+    { type:'prediction', match:'England vs USA',      team:'England 2-0', confidence:8, text:'England to win the group comfortably, 60 years of hurt ends NOW',  timestamp: ts(-3.5) },
+    { type:'hot_take',   text:'Argentina have nothing to prove as champions — they will cruise through',                                                          timestamp: ts(-3) },
+    { type:'prediction', match:'Spain vs Portugal',   team:'Portugal',    confidence:7, text:'Spain are too slow and tactically predictable — Portugal take it',  timestamp: ts(-3.2) },
+    { type:'hot_take',   text:'African teams are massively underestimated this tournament',                                                                       timestamp: ts(-2.8) },
+  ],
+  day4: [
+    { type:'reaction',  match:'Brazil vs Serbia — Final: 1-1 Draw',            text:'HOW did Brazil only draw? I had them for 3-0 minimum. The ref was clearly biased.',         timestamp: ts(-1.8) },
+    { type:'reaction',  match:'France vs Mexico — Mbappe hat-trick',           text:'Ok, Mbappe with a hat trick. He\'s decent I suppose. Maybe I was slightly harsh on him.',   timestamp: ts(-1.5) },
+    { type:'hot_take',  text:'Actually France look like the real deal now. Mbappe is back to his best and could win this tournament.',                                            timestamp: ts(-1.2) },
+    { type:'reaction',  match:'Spain vs Germany — Spain win 2-0',              text:'Spain are actually pretty good. Pedri and Yamal are generational talents.',                timestamp: ts(-0.8) },
+    { type:'prediction', match:'England vs Iran',     team:'England 2-1', confidence:6, text:'England should get through but it won\'t be pretty',                               timestamp: ts(-0.5) },
+  ],
+  finals: [
+    { type:'prediction', match:'QF1 Semi Final prediction', team:'Brazil', confidence:9, text:'Brazil are in incredible form — they will reach the final for sure', timestamp: ts(-9) },
+    { type:'reaction',   match:'Brazil vs Morocco QF — Morocco win 1-0', text:'Brazil eliminated by Morocco. I am in complete shock. Football is meaningless.',              timestamp: ts(-0.9) },
+    { type:'hot_take',   text:'Morocco are the story of the tournament. I always said African teams were underestimated.',                                                     timestamp: ts(-0.7) },
+    { type:'prediction', match:'World Cup Final',   team:'France 2-1 Morocco', confidence:7, text:'France to beat Morocco in the final — Mbappe scores twice.',                  timestamp: ts(-0.2) },
+  ]
+};
+
+function ts(dayOffset) {
+  return new Date(Date.now() + dayOffset * 86400000).toISOString();
+}
+
+// ════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════
+async function init() {
+  const h = await api('GET', '/api/health');
+  if (h) {
+    mode = h.mode;
+    updateStatusPill(h);
+    if (h.accountId) showAccountLink(h.accountId);
+  }
+  await loadTimeline();
+  updateDayCount();
+}
+
+function updateStatusPill(h) {
+  const dot  = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+
+  if (h.walrus === 'connected') {
+    dot.className = 'status-dot live';
+    text.textContent = 'Walrus Mainnet live';
+  } else if (h.mode === 'demo') {
+    dot.className = 'status-dot demo';
+    text.textContent = 'Demo mode (no keys)';
+  } else {
+    dot.className = 'status-dot error';
+    text.textContent = 'Walrus error';
+  }
+}
+
+function showAccountLink(accountId) {
+  const el = document.getElementById('account-info');
+  const a  = document.getElementById('account-link');
+  el.style.display = '';
+  a.textContent = accountId.substring(0, 20) + '…';
+  a.href = `https://suiscan.xyz/mainnet/object/${accountId}`;
+}
+
+function updateDayCount() {
+  const tournament_start = new Date('2026-06-14');
+  const now = new Date();
+  const diff = Math.max(1, Math.ceil((now - tournament_start) / 86400000));
+  document.getElementById('stat-days').textContent = diff > 0 ? diff : 1;
+}
+
+// ════════════════════════════════════════════════════
+//  TYPE SWITCHER
+// ════════════════════════════════════════════════════
+function setType(type, el) {
+  currentType = type;
+  document.querySelectorAll('.type-tab').forEach(t => {
+    t.classList.remove('active');
+  });
+  el.classList.add('active');
+
+  const fields  = document.getElementById('pred-fields');
+  const lbl     = document.getElementById('text-lbl');
+  const ta      = document.getElementById('input-text');
+
+  if (type === 'prediction') {
+    fields.style.display = '';
+    lbl.textContent = 'Your prediction';
+    ta.placeholder = 'Brazil will dominate this group, easily 3 goals per game…';
+  } else if (type === 'hot_take') {
+    fields.style.display = 'none';
+    lbl.textContent = 'Your hot take';
+    ta.placeholder = "Mbappe is massively overrated. He won't score in the knockouts…";
+  } else {
+    fields.style.display = 'none';
+    lbl.textContent = 'Your reaction';
+    ta.placeholder = "I cannot believe that result. I had them for a 3-0 win…";
+  }
+}
+
+// ════════════════════════════════════════════════════
+//  REMEMBER
+// ════════════════════════════════════════════════════
+async function doRemember() {
+  const text = document.getElementById('input-text').value.trim();
+  if (!text) { toast('Type something first!', 'err'); return; }
+
+  const btn    = document.getElementById('remember-btn');
+  const spin   = document.getElementById('rem-spin');
+  btn.disabled = true;
+  spin.style.display = 'block';
+
+  const payload = {
+    text,
+    type: currentType,
+    match: document.getElementById('match')?.value || '',
+    team:  document.getElementById('team')?.value  || '',
+    confidence: parseInt(document.getElementById('conf')?.value || 7),
+    timestamp: new Date().toISOString(),
+  };
+
+  const r = await api('POST', '/api/remember', payload);
+  if (r?.success) {
+    toast(r.mode === 'live' ? '🔗 Stored on Walrus Mainnet!' : '🎭 Stored locally (demo)', 'ok');
+    if (r.job_id) {
+      const proofRow = document.getElementById('proof-row');
+      proofRow.style.display = 'flex';
+      document.getElementById('proof-link').textContent = r.job_id.substring(0, 24) + '…';
+      if (r.explorer_url) document.getElementById('explorer-link').href = r.explorer_url;
+    }
+    document.getElementById('input-text').value = '';
+    if (document.getElementById('match')) document.getElementById('match').value = '';
+    if (document.getElementById('team'))  document.getElementById('team').value  = '';
+
+    // Immediately have agents acknowledge the new memory
+    setAgentSpeech('optimist', `*adds to file* "${text}" — noted. I'm building my dossier.`, 0, false);
+    await loadTimeline();
+  } else {
+    toast('Failed to store: ' + (r?.error || 'unknown'), 'err');
+  }
+
+  btn.disabled = false;
+  spin.style.display = 'none';
+}
+
+// ════════════════════════════════════════════════════
+//  DEBATE
+// ════════════════════════════════════════════════════
+async function doDebate() {
+  const btn = document.getElementById('debate-btn');
+  btn.disabled = true;
+  btn.textContent = '⚡ Analysing…';
+
+  setAgentSpeech('optimist', '*flipping through Walrus memory…*', 0, true);
+  setAgentSpeech('skeptic',  '*consulting the record…*', 0, true);
+
+  const r = await api('POST', '/api/debate', { topic: 'all my World Cup predictions and hot takes' });
+  if (r) {
+    setAgentSpeech('optimist', formatSpeech(r.optimist?.text || ''), r.memories_used, false);
+    setAgentSpeech('skeptic',  formatSpeech(r.skeptic?.text  || ''), r.memories_used, false);
+
+    document.getElementById('opt-count').textContent  = `${r.memories_used} memories`;
+    document.getElementById('skep-count').textContent = `${r.memories_used} memories`;
+    document.getElementById('optimist-mem').style.display = 'flex';
+    document.getElementById('skeptic-mem').style.display  = 'flex';
+  }
+
+  btn.disabled = false;
+  btn.textContent = '⚡ Start Debate';
+}
+
+function setAgentSpeech(agent, text, memCount, isThinking) {
+  const el = document.getElementById(`${agent}-speech`);
+  el.className = `agent-speech${isThinking ? ' idle' : ''}`;
+  el.innerHTML = isThinking ? `<em>${text}</em>` : text;
+}
+
+// ════════════════════════════════════════════════════
+//  PROFILE
+// ════════════════════════════════════════════════════
+async function doProfile() {
+  const btn = document.getElementById('profile-btn');
+  btn.textContent = 'Analysing…';
+  btn.disabled = true;
+
+  const txt = document.getElementById('profile-text');
+  txt.className = 'profile-text idle';
+  txt.innerHTML = '<em>*consulting Walrus Memory for your complete history…*</em>';
+
+  const r = await api('POST', '/api/profile', {});
+  if (r) {
+    txt.className = 'profile-text';
+    txt.innerHTML = formatSpeech(r.profile || 'No profile generated.');
+    if (r.memories_used > 0) {
+      document.getElementById('prof-count').textContent = `${r.memories_used} memories`;
+      document.getElementById('profile-mem').style.display = 'flex';
+    }
+  }
+
+  btn.textContent = 'Analyse →';
+  btn.disabled = false;
+}
+
+// ════════════════════════════════════════════════════
+//  TIMELINE
+// ════════════════════════════════════════════════════
+async function loadTimeline() {
+  const r = await api('GET', '/api/memories');
+  if (!r) return;
+
+  memories = r.memories || [];
+  renderTimeline(memories, r.mode);
+  updateStats(memories);
+}
+
+const TYPE_ICONS = { prediction:'🔮', hot_take:'🌶️', reaction:'😤', general:'📝' };
+
+function renderTimeline(mems, mode) {
+  const tl = document.getElementById('timeline');
+  if (!mems.length) {
+    tl.innerHTML = `<div class="tl-empty"><div class="tl-empty-icon">🏟️</div>No memories yet. Make your first prediction!</div>`;
+    return;
+  }
+  tl.innerHTML = [...mems].reverse().map(m => {
+    const type  = m.type || detectType(m.text || '');
+    const text  = m.text || m.raw || '';
+    const date  = m.timestamp ? new Date(m.timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+    return `
+      <div class="timeline-item">
+        <div class="ti-icon ${type}">${TYPE_ICONS[type] || '📝'}</div>
+        <div class="ti-body">
+          <div class="ti-text" title="${escHtml(text)}">${escHtml(text)}</div>
+          <div class="ti-meta">
+            ${date}
+            <span class="ti-badge ${mode === 'live' ? 'walrus' : 'demo'}">${mode === 'live' ? '🔗 Walrus' : '🎭 Demo'}</span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function updateStats(mems) {
+  document.getElementById('stat-total').textContent = mems.length;
+  document.getElementById('stat-pred').textContent  = mems.filter(m => (m.type || detectType(m.text)) === 'prediction').length;
+  document.getElementById('stat-takes').textContent = mems.filter(m => (m.type || detectType(m.text)) === 'hot_take').length;
+}
+
+// ════════════════════════════════════════════════════
+//  INJECT PHASES
+// ════════════════════════════════════════════════════
+async function injectPhase(phase) {
+  const batch = PHASES[phase];
+  if (!batch) return;
+  toast(`Injecting ${batch.length} memories (${phase})…`, 'info');
+
+  const r = await api('POST', '/api/demo/inject', { memories: batch });
+  if (r?.success) {
+    toast(`✅ Injected ${r.injected} memories`, 'ok');
+    await loadTimeline();
+    setAgentSpeech('optimist', `*${phase === 'day1' ? 'opening brand new file' : phase === 'day4' ? 'reviewing your Week 1 track record' : 'surveying the full tournament carnage'}*…`, 0, true);
+    setAgentSpeech('skeptic',  '*consulting the expanded record…*', 0, true);
+  }
+}
+
+// ════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════
+function detectType(text) {
+  if (text.includes('[PREDICTION')) return 'prediction';
+  if (text.includes('[HOT TAKE'))   return 'hot_take';
+  if (text.includes('[REACTION'))   return 'reaction';
+  return 'general';
+}
+
+function formatSpeech(text) {
+  // Highlight score lines
+  return escHtml(text)
+    .replace(/((?:Optimism|Credibility|Bias|Fan Archetype)[^<\n]+)/gi,
+             '<span style="display:inline-block;margin-top:8px;padding:2px 10px;background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.2);border-radius:5px;font-size:0.72rem;font-weight:700;color:var(--purple);">$1</span>');
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function api(method, path, body) {
+  try {
+    const opts = { method, headers: {} };
+    if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+    const r = await fetch(path, opts);
+    return await r.json();
+  } catch (e) {
+    console.error(path, e);
+    return null;
+  }
+}
+
+function toast(msg, type = 'info') {
+  const c = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  c.appendChild(el);
+  setTimeout(() => {
+    el.style.transition = '0.3s';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(16px)';
+    setTimeout(() => el.remove(), 300);
+  }, 3000);
+}
+
+// ════════════════════════════════════════════════════
+//  BOOT
+// ════════════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
