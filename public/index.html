@@ -748,7 +748,7 @@
         Connect Slush Wallet
       </button>
 
-      <div id="wallet-status" style="font-size:0.75rem; color:var(--text-dark); font-family:'JetBrains Mono',monospace;"></div>
+      <div id="wallet-status" style="min-height:60px; font-size:0.75rem; color:var(--text-dark); font-family:'JetBrains Mono',monospace; display:flex; align-items:center; justify-content:center; text-align:center;"></div>
 
       <!-- GOOGLE zkLogin ACCOUNT PICKER OVERLAY -->
       <div id="google-picker" style="display:none; position:absolute; inset:0; background:#0F172A; border-radius:var(--r); padding:24px; flex-direction:column; align-items:center; justify-content:center; z-index:10; border:1px solid var(--border);">
@@ -1146,33 +1146,66 @@
       }, 4000);
     }
 
-    // Wallet Standard Discovery State
+    // ─── WALLET STANDARD DISCOVERY ────────────────────────────────────────────
+    // Implements the @wallet-standard/app protocol correctly:
+    //  1. wallet-standard:register-wallet — detail IS the register callback fn
+    //  2. wallet-standard:app-ready — dispatched as CustomEvent with { detail.register }
+    //     so that already-loaded extensions can call back immediately.
+
     let detectedWallets = [];
 
-    // Listen for new wallets being registered
-    window.addEventListener("wallet-standard:register-wallet", ({ detail }) => {
-      const { register } = detail;
-      register((wallet) => {
-        if (!detectedWallets.find(w => w.name === wallet.name)) {
-          detectedWallets.push(wallet);
-          console.log("Sui Wallet Standard Discovered:", wallet.name);
-        }
-      });
+    function onWalletRegistered(wallet) {
+      if (!detectedWallets.find(w => w.name === wallet.name)) {
+        detectedWallets.push(wallet);
+        console.log('[WalletStandard] Registered:', wallet.name, wallet.accounts);
+      }
+    }
+
+    // Listen for wallets that register AFTER our script loads.
+    // Per spec: detail is the register callback function itself (not {register})
+    window.addEventListener('wallet-standard:register-wallet', (event) => {
+      // Some wallets pass detail as a fn, others as {register}; handle both
+      const detail = event.detail;
+      if (typeof detail === 'function') {
+        detail(onWalletRegistered);
+      } else if (detail && typeof detail.register === 'function') {
+        detail.register(onWalletRegistered);
+      }
     });
 
-    // Request existing wallets to register
+    // Signal to already-loaded extensions that we are ready to receive registrations.
+    // Must be a CustomEvent with detail.register so extensions can call back synchronously.
     try {
-      window.dispatchEvent(new Event("wallet-standard:app-ready"));
+      window.dispatchEvent(new CustomEvent('wallet-standard:app-ready', {
+        detail: { register: onWalletRegistered },
+        bubbles: false,
+        cancelable: false,
+      }));
     } catch (e) {
-      console.warn("Wallet Standard initialization event not supported", e);
+      console.warn('[WalletStandard] app-ready dispatch failed:', e);
     }
+
+    // Also check the legacy global registry some extensions still populate
+    function checkLegacyWallets() {
+      // Slush/Sui extension may set window.__WALLET_STANDARD__
+      if (window.__WALLET_STANDARD__ && typeof window.__WALLET_STANDARD__.register === 'function') {
+        window.__WALLET_STANDARD__.register(onWalletRegistered);
+      }
+    }
+    checkLegacyWallets();
 
     // Modal Toggles
     function toggleLoginModal() {
       const modal = document.getElementById('login-modal');
-      modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
-      if (modal.style.display === 'flex') {
-        document.getElementById('wallet-status').textContent = '';
+      const isOpening = modal.style.display === 'none' || modal.style.display === '';
+      modal.style.display = isOpening ? 'flex' : 'none';
+      if (isOpening) {
+        // Full reset: clear any previous wallet status and overlay states
+        document.getElementById('wallet-status').innerHTML = '';
+        document.getElementById('google-picker').style.display = 'none';
+        document.getElementById('google-loader').style.display = 'none';
+        const emailInput = document.getElementById('google-email-input');
+        if (emailInput) emailInput.value = '';
       }
     }
 
@@ -1235,70 +1268,115 @@
       }, 1500);
     }
 
-    // Slush Wallet Connection Handlers
+    // ─── SLUSH WALLET CONNECTION ───────────────────────────────────────────────
     async function startSlushLogin() {
       const statusEl = document.getElementById('wallet-status');
-      statusEl.textContent = 'Scanning for Sui Wallet standard extensions...';
-      
-      // Re-trigger standard discovery
-      window.dispatchEvent(new Event("wallet-standard:app-ready"));
-      
-      setTimeout(async () => {
-        let wallet = detectedWallets.find(w => 
-          w.name.toLowerCase().includes('slush') || 
-          w.name.toLowerCase().includes('sui')
-        ) || detectedWallets[0];
+      setWalletStatusUI('scanning');
 
-        // Check window fallback injection
+      // Re-signal app-ready with correct CustomEvent protocol
+      try {
+        window.dispatchEvent(new CustomEvent('wallet-standard:app-ready', {
+          detail: { register: onWalletRegistered },
+          bubbles: false,
+          cancelable: false,
+        }));
+      } catch(e) {}
+      checkLegacyWallets();
+
+      // Give the extension up to 1.2s to respond (some inject asynchronously)
+      let attempts = 0;
+      const maxAttempts = 6;
+      const tryConnect = async () => {
+        attempts++;
+        let wallet = detectedWallets.find(w =>
+          w.name.toLowerCase().includes('slush') ||
+          w.name.toLowerCase().includes('sui wallet') ||
+          w.name.toLowerCase().includes('sui')
+        ) ?? detectedWallets[0];
+
+        // Legacy global fallback (older extension versions)
         if (!wallet && window.suiWallet) {
           wallet = {
-            name: 'Slush Wallet Extension',
-            connect: async () => {
-              await window.suiWallet.requestPermissions();
-              return await window.suiWallet.getAccounts();
-            }
+            name: 'Sui Wallet (Legacy)',
+            _legacy: true,
+            features: {}
           };
         }
 
-        if (wallet) {
-          statusEl.textContent = `Connecting to ${wallet.name}...`;
-          try {
-            let accounts;
-            if (wallet.connect) {
-              accounts = await wallet.connect();
-            } else if (wallet.features && wallet.features['standard:connect']) {
-              await wallet.features['standard:connect'].connect();
-              accounts = wallet.accounts;
-            }
-            
-            if (accounts && accounts.length > 0) {
-              loginSuccess({
-                type: 'slush',
-                address: accounts[0].address,
-                name: wallet.name
-              });
-            } else {
-              statusEl.textContent = 'Connection rejected by user.';
-            }
-          } catch (err) {
-            statusEl.textContent = `Connection error: ${err.message}`;
+        if (!wallet && attempts < maxAttempts) {
+          // Keep trying every 200ms
+          setTimeout(tryConnect, 200);
+          return;
+        }
+
+        if (!wallet) {
+          // Extension genuinely not installed — show install prompt, no confirm()
+          setWalletStatusUI('not-found');
+          return;
+        }
+
+        setWalletStatusUI('connecting', wallet.name);
+
+        try {
+          let address;
+
+          if (wallet._legacy) {
+            // Legacy window.suiWallet path
+            await window.suiWallet.requestPermissions();
+            const accs = await window.suiWallet.getAccounts();
+            address = accs?.[0];
+          } else if (wallet.features?.['standard:connect']) {
+            // Wallet Standard path (Slush Wallet, newer Sui Wallet)
+            const output = await wallet.features['standard:connect'].connect({ silent: false });
+            // output.accounts is the connected accounts array
+            address = output?.accounts?.[0]?.address ?? wallet.accounts?.[0]?.address;
+          } else if (typeof wallet.connect === 'function') {
+            const result = await wallet.connect();
+            address = result?.[0]?.address ?? result?.[0] ?? result;
           }
-        } else {
-          // Simulator prompt for testing
-          statusEl.textContent = 'Slush Wallet extension not detected.';
-          const simulate = confirm("Slush Wallet extension was not detected.\nWould you like to simulate a Slush Wallet connection for testing?");
-          if (simulate) {
-            const mockAddress = '0x' + Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('');
-            loginSuccess({
-              type: 'slush',
-              address: mockAddress,
-              name: 'Demo Slush Wallet'
-            });
+
+          if (address) {
+            loginSuccess({ type: 'slush', address, name: wallet.name });
           } else {
-            statusEl.innerHTML = `No wallet found. <a href="https://slush.app" target="_blank" style="color:var(--purple); text-decoration:underline;">Download Slush Wallet</a>`;
+            setWalletStatusUI('rejected');
+          }
+        } catch (err) {
+          console.error('[SlushWallet] Connection error:', err);
+          // User rejected the popup — show a clean error, not an alert
+          if (err.message?.toLowerCase().includes('cancel') ||
+              err.message?.toLowerCase().includes('reject') ||
+              err.message?.toLowerCase().includes('denied')) {
+            setWalletStatusUI('rejected');
+          } else {
+            setWalletStatusUI('error', err.message);
           }
         }
-      }, 800);
+      };
+
+      setTimeout(tryConnect, 200);
+    }
+
+    function setWalletStatusUI(state, detail = '') {
+      const statusEl = document.getElementById('wallet-status');
+      const states = {
+        scanning:    `<span style="color:var(--text-muted);">🔍 Looking for Slush Wallet extension...</span>`,
+        connecting:  `<span style="color:var(--amber);">⏳ Connecting to ${detail}... Approve in your wallet.</span>`,
+        rejected:    `<span style="color:#F87171;">❌ Connection declined. Try again.</span>`,
+        error:       `<span style="color:#F87171;">❌ Error: ${detail}</span>`,
+        'not-found': `
+          <div style="text-align:center; padding:12px 0;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">❄️</div>
+            <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:12px; line-height:1.5;">
+              Slush Wallet extension not detected in this browser.
+            </p>
+            <a href="https://slush.app" target="_blank"
+               style="display:inline-flex; align-items:center; gap:6px; background:rgba(59, 130, 246, 0.12); border:1px solid rgba(59,130,246,0.3); color:#60A5FA; padding:8px 16px; border-radius:var(--r-sm); text-decoration:none; font-size:0.82rem; font-weight:600; font-family:'Space Grotesk',sans-serif; transition:all 0.2s;">
+              ❄️ Install Slush Wallet
+            </a>
+            <p style="color:var(--text-dark); font-size:0.7rem; margin-top:10px;">After installing, refresh this page.</p>
+          </div>`,
+      };
+      statusEl.innerHTML = states[state] ?? '';
     }
 
     // Unified Login Actions
