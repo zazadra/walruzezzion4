@@ -299,6 +299,22 @@
     .chat-send:hover { background: #7C3AED; box-shadow: var(--purple-glow); }
     .chat-send:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
 
+    .chat-suggestions {
+      display: flex; gap: 8px; margin-top: 12px; padding: 4px 0;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .chat-suggestions::-webkit-scrollbar { display: none; }
+    .suggestion-chip {
+      background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+      border-radius: 20px; padding: 6px 14px; color: var(--muted);
+      font-size: 0.76rem; cursor: pointer; white-space: nowrap;
+      transition: all 0.2s; font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+    }
+    .suggestion-chip:hover {
+      background: rgba(139,92,246,0.1); border-color: var(--purple); color: white;
+    }
+
     /* ── PREDICT ───────────────────────────────────────────────────────────── */
     .predict-intro { text-align: center; margin-bottom: 20px; color: var(--muted); font-size: 0.86rem; }
 
@@ -563,20 +579,8 @@
       </button>
 
       <button class="landing-btn slush" onclick="openLoginModal('slush')">
-        <svg class="slush-icon" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="11" stroke="#3B82F6" stroke-width="1.5"/>
-          <line x1="12" y1="4" x2="12" y2="20" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round"/>
-          <line x1="4" y1="12" x2="20" y2="12" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round"/>
-          <line x1="6.34" y1="6.34" x2="17.66" y2="17.66" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round"/>
-          <line x1="17.66" y1="6.34" x2="6.34" y2="17.66" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round"/>
-          <circle cx="12" cy="4"    r="1.5" fill="#60A5FA"/>
-          <circle cx="12" cy="20"   r="1.5" fill="#60A5FA"/>
-          <circle cx="4"  cy="12"   r="1.5" fill="#60A5FA"/>
-          <circle cx="20" cy="12"   r="1.5" fill="#60A5FA"/>
-          <circle cx="6.34" cy="6.34"   r="1.5" fill="#60A5FA"/>
-          <circle cx="17.66" cy="17.66" r="1.5" fill="#60A5FA"/>
-          <circle cx="17.66" cy="6.34"  r="1.5" fill="#60A5FA"/>
-          <circle cx="6.34"  cy="17.66" r="1.5" fill="#60A5FA"/>
+        <svg class="slush-icon" viewBox="0 0 21 22" fill="none">
+          <path d="M2.20389 17.3658C2.99124 20.3042 5.9321 22.9642 12.0166 21.3339C17.8222 19.7783 21.4606 15.0024 20.5172 11.4814C20.1914 10.2655 19.21 9.44245 17.6971 9.57634L4.1685 10.7035C3.31651 10.7689 2.92585 10.6293 2.70047 10.0924C2.48188 9.58079 2.60644 9.03156 3.63549 8.51148L13.931 3.22789C14.7201 2.8264 15.2457 2.65842 15.726 2.82837C16.027 2.93776 16.2252 3.37334 16.0432 3.91082L15.3757 5.88156C14.5564 8.3002 16.3101 8.86199 17.2988 8.59707C18.7946 8.19628 19.1465 6.77164 18.6646 4.97313C17.4429 0.413541 12.6054 -0.299349 8.21953 0.875847C3.75759 2.07142 -0.110259 5.68703 1.07076 10.0946C1.34904 11.1332 2.30504 11.963 3.41235 11.9378L5.10282 11.9337C5.45046 11.9257 5.32529 11.9543 5.99599 11.8987C6.66668 11.8431 8.45787 11.6227 8.45787 11.6227L17.2472 10.6281L17.4736 10.5952C17.9877 10.5075 18.3761 10.641 18.7046 11.2069C19.1961 12.0535 18.4462 12.692 17.5485 13.4563C17.5245 13.4768 17.5004 13.4973 17.4762 13.518L9.75005 20.1765C8.42577 21.3187 7.49552 20.8892 7.16973 19.6733L6.01586 15.367C5.73079 14.3031 4.69194 13.4683 3.47505 13.7944C1.95393 14.202 1.83058 15.9726 2.20389 17.3658Z" fill="white"/>
         </svg>
         Connect Slush Wallet
       </button>
@@ -629,6 +633,12 @@
               <div class="meta">The Oracle</div>
               Greetings, strategist. I am The Oracle. I query your past predictions from Walrus Memory to analyze your World Cup biases. What matchup is on your mind?
             </div>
+          </div>
+          <div class="chat-suggestions" id="chat-suggestions">
+            <button class="suggestion-chip" onclick="sendChat('Analyze my prediction biases so far')">🧠 Analyze my biases</button>
+            <button class="suggestion-chip" onclick="sendChat('Will Mexico beat South Africa in the opening match?')">🇲🇽 Mex vs RSA prediction</button>
+            <button class="suggestion-chip" onclick="sendChat('Explain how Walrus Memory keeps my data secure')">🛡️ Walrus security</button>
+            <button class="suggestion-chip" onclick="sendChat('What team have I backed the most?')">⚽ My top team</button>
           </div>
           <div class="chat-foot">
             <input type="text" id="chat-input" class="chat-input"
@@ -689,20 +699,8 @@
 
       <!-- Slush Wallet -->
       <button class="auth-btn slush" onclick="startSlushLogin()">
-        <svg class="slush-icon" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="11" stroke="#3B82F6" stroke-width="1.5"/>
-          <line x1="12" y1="4" x2="12" y2="20" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round"/>
-          <line x1="4" y1="12" x2="20" y2="12" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round"/>
-          <line x1="6.34" y1="6.34" x2="17.66" y2="17.66" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round"/>
-          <line x1="17.66" y1="6.34" x2="6.34" y2="17.66" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round"/>
-          <circle cx="12" cy="4" r="1.5" fill="#60A5FA"/>
-          <circle cx="12" cy="20" r="1.5" fill="#60A5FA"/>
-          <circle cx="4" cy="12" r="1.5" fill="#60A5FA"/>
-          <circle cx="20" cy="12" r="1.5" fill="#60A5FA"/>
-          <circle cx="6.34" cy="6.34" r="1.5" fill="#60A5FA"/>
-          <circle cx="17.66" cy="17.66" r="1.5" fill="#60A5FA"/>
-          <circle cx="17.66" cy="6.34" r="1.5" fill="#60A5FA"/>
-          <circle cx="6.34" cy="17.66" r="1.5" fill="#60A5FA"/>
+        <svg class="slush-icon" viewBox="0 0 21 22" fill="none">
+          <path d="M2.20389 17.3658C2.99124 20.3042 5.9321 22.9642 12.0166 21.3339C17.8222 19.7783 21.4606 15.0024 20.5172 11.4814C20.1914 10.2655 19.21 9.44245 17.6971 9.57634L4.1685 10.7035C3.31651 10.7689 2.92585 10.6293 2.70047 10.0924C2.48188 9.58079 2.60644 9.03156 3.63549 8.51148L13.931 3.22789C14.7201 2.8264 15.2457 2.65842 15.726 2.82837C16.027 2.93776 16.2252 3.37334 16.0432 3.91082L15.3757 5.88156C14.5564 8.3002 16.3101 8.86199 17.2988 8.59707C18.7946 8.19628 19.1465 6.77164 18.6646 4.97313C17.4429 0.413541 12.6054 -0.299349 8.21953 0.875847C3.75759 2.07142 -0.110259 5.68703 1.07076 10.0946C1.34904 11.1332 2.30504 11.963 3.41235 11.9378L5.10282 11.9337C5.45046 11.9257 5.32529 11.9543 5.99599 11.8987C6.66668 11.8431 8.45787 11.6227 8.45787 11.6227L17.2472 10.6281L17.4736 10.5952C17.9877 10.5075 18.3761 10.641 18.7046 11.2069C19.1961 12.0535 18.4462 12.692 17.5485 13.4563C17.5245 13.4768 17.5004 13.4973 17.4762 13.518L9.75005 20.1765C8.42577 21.3187 7.49552 20.8892 7.16973 19.6733L6.01586 15.367C5.73079 14.3031 4.69194 13.4683 3.47505 13.7944C1.95393 14.202 1.83058 15.9726 2.20389 17.3658Z" fill="#3B82F6"/>
         </svg>
         Connect Slush Wallet
       </button>
@@ -748,8 +746,12 @@
       <p style="font-size:0.78rem;color:var(--muted);margin-bottom:18px;line-height:1.4;">Configure your personal API keys. Stored locally in your browser.</p>
 
       <div class="field">
-        <label>OpenRouter API Key</label>
+        <label>OpenRouter API Key (Optional)</label>
         <input type="password" id="set-openrouter-key" placeholder="sk-or-v1-…" style="font-family:'JetBrains Mono',monospace;">
+      </div>
+      <div class="field">
+        <label>Gemini API Key (Optional - for Free AI Studio access)</label>
+        <input type="password" id="set-gemini-key" placeholder="AIzaSy…" style="font-family:'JetBrains Mono',monospace;">
       </div>
       <div class="field">
         <label>AI Model Preference</label>
@@ -806,10 +808,12 @@
     function apiHeaders() {
       const h = { 'Content-Type': 'application/json' };
       const k = localStorage.getItem('wc2026_openrouter_key');
+      const gk = localStorage.getItem('wc2026_gemini_key');
       const m = localStorage.getItem('wc2026_model');
       const wk = localStorage.getItem('wc2026_walrus_key');
       const wa = localStorage.getItem('wc2026_walrus_account');
       if (k) h['x-openrouter-api-key'] = k;
+      if (gk) h['x-gemini-key'] = gk;
       if (m) h['x-openrouter-model'] = m;
       if (wk) h['x-walrus-key'] = wk;
       if (wa) h['x-walrus-account'] = wa;
@@ -939,10 +943,10 @@
       hist.scrollTop = hist.scrollHeight;
     }
 
-    async function sendChat() {
+    async function sendChat(overrideText) {
       const input = document.getElementById('chat-input');
       const btn = document.getElementById('chat-send');
-      const msg = input.value.trim();
+      const msg = (overrideText || input.value).trim();
       if (!msg) return;
       input.value = '';
       btn.disabled = true;
@@ -1157,10 +1161,12 @@
     // ── SETTINGS ─────────────────────────────────────────────────────────────
     function loadSettings() {
       const or = localStorage.getItem('wc2026_openrouter_key');
+      const gk = localStorage.getItem('wc2026_gemini_key');
       const m  = localStorage.getItem('wc2026_model');
       const wk = localStorage.getItem('wc2026_walrus_key');
       const wa = localStorage.getItem('wc2026_walrus_account');
       if (or) document.getElementById('set-openrouter-key').value = or;
+      if (gk) document.getElementById('set-gemini-key').value = gk;
       if (m)  document.getElementById('set-model').value = m;
       if (wk) document.getElementById('set-walrus-key').value = wk;
       if (wa) document.getElementById('set-walrus-account').value = wa;
@@ -1169,11 +1175,14 @@
 
     function saveSettings() {
       const or = document.getElementById('set-openrouter-key').value.trim();
+      const gk = document.getElementById('set-gemini-key').value.trim();
       const m  = document.getElementById('set-model').value;
       const wk = document.getElementById('set-walrus-key').value.trim();
       const wa = document.getElementById('set-walrus-account').value.trim();
       if (or) localStorage.setItem('wc2026_openrouter_key', or);
       else    localStorage.removeItem('wc2026_openrouter_key');
+      if (gk) localStorage.setItem('wc2026_gemini_key', gk);
+      else    localStorage.removeItem('wc2026_gemini_key');
       if (m)  localStorage.setItem('wc2026_model', m);
       if (wk) localStorage.setItem('wc2026_walrus_key', wk);
       else    localStorage.removeItem('wc2026_walrus_key');

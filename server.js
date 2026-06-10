@@ -100,8 +100,30 @@ function getMemWalClient(headers) {
 
 async function generateAIResponse(prompt, system, headers) {
   const openRouterKey = headers['x-openrouter-api-key'];
+  const customGeminiKey = headers['x-gemini-key'];
   const model = headers['x-openrouter-model'] || 'google/gemini-2.5-flash';
 
+  const localModelName = model.startsWith('google/')
+    ? model.replace('google/', '')
+    : 'gemini-2.5-flash';
+
+  // 1. If custom Gemini Key is provided, use it directly with the Google provider
+  if (customGeminiKey) {
+    try {
+      const customGoogle = createGoogleGenerativeAI({ apiKey: customGeminiKey });
+      const { text } = await generateText({
+        model: customGoogle(localModelName),
+        system: system,
+        prompt: prompt,
+      });
+      return text;
+    } catch (err) {
+      console.error('Custom Gemini SDK Error:', err.message);
+      throw new Error(`Failed to generate response using custom Gemini API Key: ${err.message}`);
+    }
+  }
+
+  // 2. If OpenRouter key is provided, use OpenRouter completions
   if (openRouterKey) {
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -132,13 +154,13 @@ async function generateAIResponse(prompt, system, headers) {
     return data.choices[0].message.content;
   }
 
-  // Fallback to local Gemini client
+  // 3. Fallback to server's local default Gemini client
   if (!google) {
-    throw new Error('No AI provider configured. Please enter an OpenRouter API key in settings.');
+    throw new Error('No AI provider configured. Please enter a Gemini API key or OpenRouter API key in settings.');
   }
 
   const { text } = await generateText({
-    model: google('gemini-2.5-flash'),
+    model: google(localModelName),
     system: system,
     prompt: prompt,
   });
