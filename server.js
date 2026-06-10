@@ -24,7 +24,7 @@ const WALRUS_MEMORY_API_KEY = process.env.WALRUS_MEMORY_API_KEY || process.env.M
 const WALRUS_ACCOUNT_ID = process.env.MEMWAL_ACCOUNT_ID;
 const RELAYER_URL = process.env.MEMWAL_RELAYER_URL || 'https://relayer.memory.walrus.xyz';
 
-console.log(`\n⚽ Walruzezzion4 Backend`);
+console.log(`\n⚽ Walruzezzion4 Backend (OpenRouter Capable)`);
 console.log(`   Gemini API Key: ${GEMINI_API_KEY ? '✅ Configured' : '❌ Missing'}`);
 console.log(`   Walrus Memory Key: ${WALRUS_MEMORY_API_KEY ? '✅ Configured' : '❌ Missing'}`);
 console.log(`   Walrus Account ID: ${WALRUS_ACCOUNT_ID || '❌ Missing'}`);
@@ -41,7 +41,7 @@ if (WALRUS_MEMORY_API_KEY && WALRUS_ACCOUNT_ID) {
       serverUrl: RELAYER_URL,
       namespace: NAMESPACE,
     });
-    console.log(`   Walrus: Connected successfully to account ${WALRUS_ACCOUNT_ID.substring(0, 16)}…`);
+    console.log(`   Walrus: Default client connected successfully`);
   } catch (err) {
     console.error(`   Walrus Connection Error:`, err.message);
   }
@@ -50,22 +50,97 @@ if (WALRUS_MEMORY_API_KEY && WALRUS_ACCOUNT_ID) {
 if (GEMINI_API_KEY) {
   try {
     google = createGoogleGenerativeAI({ apiKey: GEMINI_API_KEY });
-    console.log(`   Gemini AI: Connected successfully`);
+    console.log(`   Gemini AI: Default client connected successfully`);
   } catch (err) {
     console.error(`   Gemini Connection Error:`, err.message);
   }
 }
 
-// ─── HELPER FOR SENTIMENT ANALYSIS ───────────────────────────────────────────
-async function analyzeSentiment(text) {
-  if (!google) return 'NEUTRAL';
-  try {
-    const { text: sentiment } = await generateText({
-      model: google('gemini-2.5-flash'),
-      system: 'You are a sentiment classifier. Respond with exactly one word in uppercase: POSITIVE, NEGATIVE, NEUTRAL, OPTIMISTIC, or SKEPTICAL. Do not add punctuation or explanation.',
-      prompt: `Analyze the sentiment of this message: "${text}"`,
+// ─── DYNAMIC CLIENT RESOLVERS & HELPERS ──────────────────────────────────────
+
+function getMemWalClient(headers) {
+  const customKey = headers['x-walrus-key'];
+  const customAccount = headers['x-walrus-account'];
+
+  if (customKey && customAccount) {
+    try {
+      return MemWal.create({
+        key: customKey,
+        accountId: customAccount,
+        serverUrl: RELAYER_URL,
+        namespace: NAMESPACE,
+      });
+    } catch (err) {
+      console.error('Failed to create custom MemWal client:', err.message);
+      throw new Error('Invalid custom Walrus Memory credentials provided: ' + err.message);
+    }
+  }
+
+  if (!memwal) {
+    throw new Error('Walrus Memory is not configured on the server. Please enter your credentials in settings.');
+  }
+
+  return memwal;
+}
+
+async function generateAIResponse(prompt, system, headers) {
+  const openRouterKey = headers['x-openrouter-api-key'];
+  const model = headers['x-openrouter-model'] || 'google/gemini-2.5-flash';
+
+  if (openRouterKey) {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${openRouterKey}`,
+        'HTTP-Referer': 'https://walruzezzion4.vercel.app',
+        'X-Title': 'Walruzezzion4'
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: prompt }
+        ]
+      })
     });
-    return sentiment.trim().toUpperCase();
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error?.message || `OpenRouter returned status ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response received from OpenRouter completions');
+    }
+    return data.choices[0].message.content;
+  }
+
+  // Fallback to local Gemini client
+  if (!google) {
+    throw new Error('No AI provider configured. Please enter an OpenRouter API key in settings.');
+  }
+
+  const { text } = await generateText({
+    model: google('gemini-2.5-flash'),
+    system: system,
+    prompt: prompt,
+  });
+  return text;
+}
+
+async function analyzeSentiment(text, headers) {
+  const system = 'You are a sentiment classifier. Respond with exactly one word in uppercase: POSITIVE, NEGATIVE, NEUTRAL, OPTIMISTIC, or SKEPTICAL. Do not add punctuation or explanation.';
+  const prompt = `Analyze the sentiment of this message: "${text}"`;
+  try {
+    const sentiment = await generateAIResponse(prompt, system, headers);
+    const cleaned = sentiment.trim().toUpperCase().replace(/[^A-Z]/g, '');
+    const validSentiments = ['POSITIVE', 'NEGATIVE', 'NEUTRAL', 'OPTIMISTIC', 'SKEPTICAL'];
+    for (const vs of validSentiments) {
+      if (cleaned.includes(vs)) return vs;
+    }
+    return 'NEUTRAL';
   } catch (err) {
     console.error('Sentiment Analysis Error:', err.message);
     return 'NEUTRAL';
@@ -74,7 +149,7 @@ async function analyzeSentiment(text) {
 
 // ─── ROUTES ───────────────────────────────────────────────────────────────────
 
-// Health & Status Check
+// Health Check
 app.get('/api/health', async (req, res) => {
   let walrusStatus = 'not_configured';
   if (memwal) {
@@ -100,25 +175,21 @@ app.post('/api/chat', async (req, res) => {
     return res.status(400).json({ error: 'Message is required' });
   }
 
-  if (!google) {
-    return res.status(500).json({ error: 'Gemini AI API key is not configured' });
-  }
-
   try {
-    // 1. Determine sentiment
-    const sentiment = await analyzeSentiment(message);
+    const activeMemwal = getMemWalClient(req.headers);
 
-    // 2. Fetch past context from Walrus to inject into Oracle memory
+    // 1. Determine sentiment
+    const sentiment = await analyzeSentiment(message, req.headers);
+
+    // 2. Fetch past context from Walrus Memory
     let pastContext = '';
-    if (memwal) {
-      try {
-        const recalled = await memwal.recall({ query: message, limit: 10 });
-        if (recalled?.results?.length > 0) {
-          pastContext = recalled.results.map(r => `• ${r.text}`).join('\n');
-        }
-      } catch (err) {
-        console.warn('Could not retrieve context from Walrus:', err.message);
+    try {
+      const recalled = await activeMemwal.recall({ query: message, limit: 10 });
+      if (recalled?.results?.length > 0) {
+        pastContext = recalled.results.map(r => `• ${r.text}`).join('\n');
       }
+    } catch (err) {
+      console.warn('Could not retrieve context from Walrus:', err.message);
     }
 
     // 3. System Prompt for Oracle
@@ -129,21 +200,15 @@ Keep your responses concise and impactful — maximum 2-3 sentences.`;
 
     const promptWithContext = message + (pastContext ? `\n\n[RECALLED CONTEXT FROM WALRUS MEMORY]:\n${pastContext}` : '');
 
-    // 4. Generate response from Gemini
-    const { text: aiResponse } = await generateText({
-      model: google('gemini-2.5-flash'),
-      system: systemPrompt,
-      prompt: promptWithContext,
-    });
+    // 4. Generate response
+    const aiResponse = await generateAIResponse(promptWithContext, systemPrompt, req.headers);
 
-    // 5. Store conversation details asynchronously in Walrus Memory
-    if (memwal) {
-      const userMemory = `[CHAT | Sentiment: ${sentiment}] User: "${message}"`;
-      const oracleMemory = `[ORACLE | Response] Oracle: "${aiResponse}"`;
-      
-      memwal.remember(userMemory).catch(err => console.error('Failed to log User chat to Walrus:', err.message));
-      memwal.remember(oracleMemory).catch(err => console.error('Failed to log Oracle response to Walrus:', err.message));
-    }
+    // 5. Store conversation details in Walrus Memory
+    const userMemory = `[CHAT | Sentiment: ${sentiment}] User: "${message}"`;
+    const oracleMemory = `[ORACLE | Response] Oracle: "${aiResponse}"`;
+    
+    activeMemwal.remember(userMemory).catch(err => console.error('Failed to log User chat to Walrus:', err.message));
+    activeMemwal.remember(oracleMemory).catch(err => console.error('Failed to log Oracle response to Walrus:', err.message));
 
     res.json({ response: aiResponse });
   } catch (err) {
@@ -159,15 +224,12 @@ app.post('/api/predict', async (req, res) => {
     return res.status(400).json({ error: 'matchName and chosenTeam are required' });
   }
 
-  if (!memwal) {
-    return res.status(500).json({ error: 'Walrus Memory API key is not configured' });
-  }
-
-  const timestamp = new Date().toISOString();
-  const predictionMemory = `[PREDICTION | ${timestamp}] Match: ${matchName} | Picked: ${chosenTeam}`;
-
   try {
-    const job = await memwal.remember(predictionMemory);
+    const activeMemwal = getMemWalClient(req.headers);
+    const timestamp = new Date().toISOString();
+    const predictionMemory = `[PREDICTION | ${timestamp}] Match: ${matchName} | Picked: ${chosenTeam}`;
+
+    const job = await activeMemwal.remember(predictionMemory);
     res.json({
       success: true,
       jobId: job.job_id,
@@ -181,16 +243,11 @@ app.post('/api/predict', async (req, res) => {
 
 // Tab 3: Signals endpoint (Evolution brief)
 app.get('/api/signals', async (req, res) => {
-  if (!memwal) {
-    return res.status(500).json({ error: 'Walrus Memory API key is not configured' });
-  }
-  if (!google) {
-    return res.status(500).json({ error: 'Gemini AI API key is not configured' });
-  }
-
   try {
+    const activeMemwal = getMemWalClient(req.headers);
+
     // 1. Recall historical memories
-    const recalled = await memwal.recall({
+    const recalled = await activeMemwal.recall({
       query: 'World Cup chats predictions sentiment reactions hot takes',
       limit: 50
     });
@@ -217,11 +274,7 @@ Write a 1-2 paragraph "Memory Insight" outlining:
     const promptText = `Analyze the following memory logs retrieved from the user's ledger and provide their fan evolution dossier:\n\n${contextText}`;
 
     // 4. Generate completions
-    const { text: insight } = await generateText({
-      model: google('gemini-2.5-flash'),
-      system: systemPrompt,
-      prompt: promptText,
-    });
+    const insight = await generateAIResponse(promptText, systemPrompt, req.headers);
 
     res.json({
       insight,
