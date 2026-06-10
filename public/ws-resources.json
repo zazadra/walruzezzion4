@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "site_name": "Walruzezzion4 — World Cup AI Oracle",
+    "description": "AI-powered World Cup 2026 prediction oracle built on Walrus Memory Protocol. Chat with The Oracle, predict match outcomes, and track AI signals — all backed by decentralized memory on Walrus/Sui.",
+    "link": "https://walruzezzion4.wal.app"
+  },
+  "headers": {
+    "/index.html": {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "no-cache, no-store, must-revalidate"
+    }
+  },
+  "routes": {
+    "/*": "/index.html"
+  },
+  "ignore": []
+}
