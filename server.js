@@ -61,6 +61,7 @@ if (GEMINI_API_KEY) {
 function getMemWalClient(headers) {
   const customKey = headers['x-walrus-key'];
   const customAccount = headers['x-walrus-account'];
+  const customNamespace = headers['x-walrus-namespace'] || NAMESPACE;
 
   if (customKey && customAccount) {
     try {
@@ -68,7 +69,7 @@ function getMemWalClient(headers) {
         key: customKey,
         accountId: customAccount,
         serverUrl: RELAYER_URL,
-        namespace: NAMESPACE,
+        namespace: customNamespace,
       });
     } catch (err) {
       console.error('Failed to create custom MemWal client:', err.message);
@@ -78,6 +79,20 @@ function getMemWalClient(headers) {
 
   if (!memwal) {
     throw new Error('Walrus Memory is not configured on the server. Please enter your credentials in settings.');
+  }
+
+  // Dynamic user-level namespace isolation
+  if (customNamespace !== NAMESPACE) {
+    try {
+      return MemWal.create({
+        key: WALRUS_MEMORY_API_KEY,
+        accountId: WALRUS_ACCOUNT_ID,
+        serverUrl: RELAYER_URL,
+        namespace: customNamespace,
+      });
+    } catch (err) {
+      console.error('Failed to create isolated MemWal client:', err.message);
+    }
   }
 
   return memwal;
