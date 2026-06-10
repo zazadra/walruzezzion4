@@ -108,7 +108,7 @@ async function generateAIResponse(prompt, system, headers) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${openRouterKey}`,
-        'HTTP-Referer': 'https://walruzezzion4.vercel.app',
+        'HTTP-Referer': process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://walruzezzion4.vercel.app',
         'X-Title': 'Walruzezzion4'
       },
       body: JSON.stringify({
@@ -234,7 +234,7 @@ Keep your responses concise and impactful — maximum 2-3 sentences.`;
 
 // Tab 2: Predict endpoint
 app.post('/api/predict', async (req, res) => {
-  const { matchName, chosenTeam } = req.body;
+  const { matchName, chosenTeam, homeScore, awayScore } = req.body;
   if (!matchName || !chosenTeam) {
     return res.status(400).json({ error: 'matchName and chosenTeam are required' });
   }
@@ -242,7 +242,10 @@ app.post('/api/predict', async (req, res) => {
   try {
     const activeMemwal = getMemWalClient(req.headers);
     const timestamp = new Date().toISOString();
-    const predictionMemory = `[PREDICTION | ${timestamp}] Match: ${matchName} | Picked: ${chosenTeam}`;
+    const scoreStr = (homeScore !== undefined && awayScore !== undefined)
+      ? ` | Score: ${homeScore}-${awayScore}`
+      : '';
+    const predictionMemory = `[PREDICTION | ${timestamp}] Match: ${matchName} | Picked: ${chosenTeam}${scoreStr}`;
 
     const job = await activeMemwal.remember(predictionMemory);
     res.json({
@@ -252,6 +255,23 @@ app.post('/api/predict', async (req, res) => {
     });
   } catch (err) {
     console.error('Prediction log error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Cancel Predict: log cancellation to Walrus Memory
+app.post('/api/cancel-predict', async (req, res) => {
+  const { matchName, chosenTeam } = req.body;
+  if (!matchName) return res.status(400).json({ error: 'matchName is required' });
+
+  try {
+    const activeMemwal = getMemWalClient(req.headers);
+    const timestamp = new Date().toISOString();
+    const cancelMemory = `[PREDICTION_CANCELLED | ${timestamp}] Match: ${matchName} | Was: ${chosenTeam || 'unknown'}`;
+    const job = await activeMemwal.remember(cancelMemory);
+    res.json({ success: true, jobId: job.job_id });
+  } catch (err) {
+    console.error('Cancel prediction error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -394,7 +414,16 @@ app.get('/api/matches', async (req, res) => {
   }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server listening on http://localhost:${PORT}`);
-});
+// Start server (local dev only — Vercel uses the default export below)
+if (process.env.NODE_ENV !== 'production' || process.env.LOCAL_DEV) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server listening on http://localhost:${PORT}`);
+  });
+} else {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server listening on port ${PORT}`);
+  });
+}
+
+// Vercel serverless export
+export default app;
