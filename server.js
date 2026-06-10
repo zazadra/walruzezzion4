@@ -61,7 +61,7 @@ async function analyzeSentiment(text) {
   if (!google) return 'NEUTRAL';
   try {
     const { text: sentiment } = await generateText({
-      model: google('gemini-1.5-flash'),
+      model: google('gemini-2.5-flash'),
       system: 'You are a sentiment classifier. Respond with exactly one word in uppercase: POSITIVE, NEGATIVE, NEUTRAL, OPTIMISTIC, or SKEPTICAL. Do not add punctuation or explanation.',
       prompt: `Analyze the sentiment of this message: "${text}"`,
     });
@@ -131,7 +131,7 @@ Keep your responses concise and impactful — maximum 2-3 sentences.`;
 
     // 4. Generate response from Gemini
     const { text: aiResponse } = await generateText({
-      model: google('gemini-1.5-flash'),
+      model: google('gemini-2.5-flash'),
       system: systemPrompt,
       prompt: promptWithContext,
     });
@@ -218,7 +218,7 @@ Write a 1-2 paragraph "Memory Insight" outlining:
 
     // 4. Generate completions
     const { text: insight } = await generateText({
-      model: google('gemini-1.5-flash'),
+      model: google('gemini-2.5-flash'),
       system: systemPrompt,
       prompt: promptText,
     });
