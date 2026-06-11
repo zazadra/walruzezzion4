@@ -103,23 +103,32 @@ async function generateAIResponse(prompt, system, headers) {
   const customGeminiKey = headers['x-gemini-key'];
   const model = headers['x-openrouter-model'] || 'google/gemini-2.5-flash';
 
-  const localModelName = model.startsWith('google/')
-    ? model.replace('google/', '')
-    : 'gemini-2.5-flash';
+  // Resolve local Gemini model name from OpenRouter model ID
+  const resolveGeminiModel = (m) => {
+    if (m.startsWith('google/')) return m.replace('google/', '').replace(':free', '');
+    return 'gemini-2.0-flash'; // default safe fallback
+  };
 
   // 1. If custom Gemini Key is provided, use it directly with the Google provider
   if (customGeminiKey) {
-    try {
-      const customGoogle = createGoogleGenerativeAI({ apiKey: customGeminiKey });
-      const { text } = await generateText({
-        model: customGoogle(localModelName),
-        system: system,
-        prompt: prompt,
-      });
-      return text;
-    } catch (err) {
-      console.error('Custom Gemini SDK Error:', err.message);
-      throw new Error(`Failed to generate response using custom Gemini API Key: ${err.message}`);
+    const localModelName = resolveGeminiModel(model);
+    // Try requested model, fall back to gemini-2.0-flash if it fails
+    const tryModels = [localModelName, 'gemini-2.0-flash'].filter((v, i, a) => a.indexOf(v) === i);
+    for (const geminiModel of tryModels) {
+      try {
+        const customGoogle = createGoogleGenerativeAI({ apiKey: customGeminiKey });
+        const { text } = await generateText({
+          model: customGoogle(geminiModel),
+          system: system,
+          prompt: prompt,
+        });
+        return text;
+      } catch (err) {
+        console.warn(`Custom Gemini SDK failed with model ${geminiModel}:`, err.message);
+        if (geminiModel === tryModels[tryModels.length - 1]) {
+          throw new Error(`Gemini API Key error: ${err.message}. Try a different model or check your API key.`);
+        }
+      }
     }
   }
 
@@ -144,27 +153,50 @@ async function generateAIResponse(prompt, system, headers) {
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.error?.message || `OpenRouter returned status ${response.status}`);
+      const errMsg = errData.error?.message || `OpenRouter HTTP ${response.status}`;
+      // Provide helpful guidance based on error type
+      if (response.status === 404 || errMsg.includes('No endpoints found')) {
+        throw new Error(`Model not available: "${model}" — Try selecting a ":free" model in Settings, or use a Gemini API key instead.`);
+      }
+      if (response.status === 401 || response.status === 403) {
+        throw new Error(`OpenRouter authentication failed. Check your API key in Settings.`);
+      }
+      throw new Error(errMsg);
     }
 
     const data = await response.json();
     if (!data.choices?.[0]?.message?.content) {
-      throw new Error('Invalid response received from OpenRouter completions');
+      throw new Error('Invalid response from OpenRouter. Check your selected model in Settings.');
     }
     return data.choices[0].message.content;
   }
 
   // 3. Fallback to server's local default Gemini client
   if (!google) {
-    throw new Error('No AI provider configured. Please enter a Gemini API key or OpenRouter API key in settings.');
+    throw new Error('No AI provider configured. Please add a Gemini API key or OpenRouter key in Settings (⚙️).');
   }
 
-  const { text } = await generateText({
-    model: google(localModelName),
-    system: system,
-    prompt: prompt,
-  });
-  return text;
+  const localModelName = resolveGeminiModel(model);
+  try {
+    const { text } = await generateText({
+      model: google(localModelName),
+      system: system,
+      prompt: prompt,
+    });
+    return text;
+  } catch (err) {
+    // Fallback to stable model if experimental fails
+    if (localModelName !== 'gemini-2.0-flash') {
+      console.warn(`Server Gemini ${localModelName} failed, falling back to gemini-2.0-flash:`, err.message);
+      const { text } = await generateText({
+        model: google('gemini-2.0-flash'),
+        system: system,
+        prompt: prompt,
+      });
+      return text;
+    }
+    throw err;
+  }
 }
 
 async function analyzeSentiment(text, headers) {

@@ -636,8 +636,11 @@
           </div>
           <div class="chat-suggestions" id="chat-suggestions">
             <button class="suggestion-chip" onclick="sendChat('Analyze my prediction biases so far')">🧠 Analyze my biases</button>
-            <button class="suggestion-chip" onclick="sendChat('Will Mexico beat South Africa in the opening match?')">🇲🇽 Mex vs RSA prediction</button>
-            <button class="suggestion-chip" onclick="sendChat('Explain how Walrus Memory keeps my data secure')">🛡️ Walrus security</button>
+            <button class="suggestion-chip" onclick="sendChat('Who is the favorite to win World Cup 2026?')">🏆 Who will win?</button>
+            <button class="suggestion-chip" onclick="sendChat('Will Mexico beat South Africa in the opening match?')">🇲🇽 Mex vs RSA</button>
+            <button class="suggestion-chip" onclick="sendChat('Give me a dark horse pick for the tournament')">🐴 Dark horse pick</button>
+            <button class="suggestion-chip" onclick="sendChat('Explain how Walrus Memory stores my predictions on-chain')">🛡️ How Walrus works</button>
+            <button class="suggestion-chip" onclick="sendChat('Which team should I bet on for the best value?')">💡 Best value bet</button>
             <button class="suggestion-chip" onclick="sendChat('What team have I backed the most?')">⚽ My top team</button>
           </div>
           <div class="chat-foot">
@@ -740,33 +743,54 @@
 
   <!-- SETTINGS MODAL -->
   <div class="modal-bg" id="settings-modal">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width:520px;">
       <button class="modal-close" onclick="closeModal('settings-modal')">✕</button>
-      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:4px;">⚙️ Key Management</h2>
-      <p style="font-size:0.78rem;color:var(--muted);margin-bottom:18px;line-height:1.4;">Configure your personal API keys. Stored locally in your browser.</p>
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:4px;">⚙️ Settings & API Keys</h2>
+      <p style="font-size:0.78rem;color:var(--muted);margin-bottom:18px;line-height:1.4;">Configure your personal API keys. All stored locally in your browser — never sent to our servers.</p>
 
-      <div class="field">
-        <label>OpenRouter API Key (Optional)</label>
-        <input type="password" id="set-openrouter-key" placeholder="sk-or-v1-…" style="font-family:'JetBrains Mono',monospace;">
+      <!-- AI Provider Section -->
+      <div style="border:1px solid rgba(139,92,246,0.2);border-radius:var(--r-sm);padding:14px;margin-bottom:14px;background:rgba(139,92,246,0.04);">
+        <p style="font-size:0.7rem;font-weight:700;font-family:'Space Grotesk',sans-serif;color:#A78BFA;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;">🤖 AI Provider</p>
+
+        <div class="field">
+          <label>Gemini API Key <span style="color:#34D399;font-size:0.65rem;">(Recommended — Free quota available)</span></label>
+          <input type="password" id="set-gemini-key" placeholder="AIzaSy…" style="font-family:'JetBrains Mono',monospace;">
+          <p style="font-size:0.67rem;color:var(--dark);margin-top:4px;">Get your free key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:#A78BFA;text-decoration:none;">aistudio.google.com</a> — no credit card needed.</p>
+        </div>
+
+        <div class="field">
+          <label>OpenRouter API Key <span style="color:var(--dark);font-size:0.65rem;">(Optional — for extra model choice)</span></label>
+          <input type="password" id="set-openrouter-key" placeholder="sk-or-v1-…" style="font-family:'JetBrains Mono',monospace;">
+          <p style="font-size:0.67rem;color:var(--dark);margin-top:4px;">Get at <a href="https://openrouter.ai/keys" target="_blank" style="color:#A78BFA;text-decoration:none;">openrouter.ai/keys</a>. Note: You need credits to use paid models.</p>
+        </div>
+
+        <div class="field">
+          <label>AI Model</label>
+          <select id="set-model">
+            <optgroup label="── Gemini Direct (uses Gemini Key above) ──">
+              <option value="google/gemini-2.0-flash">Gemini 2.0 Flash ⚡ (Fast & Free)</option>
+              <option value="google/gemini-2.5-flash">Gemini 2.5 Flash ✨ (Smarter)</option>
+            </optgroup>
+            <optgroup label="── OpenRouter FREE (uses OpenRouter Key) ──">
+              <option value="google/gemini-2.0-flash-lite:free">Gemini 2.0 Flash Lite (Free tier)</option>
+              <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B (Free tier)</option>
+              <option value="deepseek/deepseek-chat:free">DeepSeek Chat (Free tier)</option>
+              <option value="mistralai/mistral-7b-instruct:free">Mistral 7B (Free tier)</option>
+            </optgroup>
+            <optgroup label="── OpenRouter PAID (requires credits) ──">
+              <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet (Paid)</option>
+              <option value="anthropic/claude-3-haiku">Claude 3 Haiku (Paid)</option>
+              <option value="openai/gpt-4o-mini">GPT-4o Mini (Paid)</option>
+            </optgroup>
+          </select>
+          <p id="model-hint" style="font-size:0.67rem;color:var(--dark);margin-top:4px;"></p>
+        </div>
       </div>
-      <div class="field">
-        <label>Gemini API Key (Optional - for Free AI Studio access)</label>
-        <input type="password" id="set-gemini-key" placeholder="AIzaSy…" style="font-family:'JetBrains Mono',monospace;">
-      </div>
-      <div class="field">
-        <label>AI Model Preference</label>
-        <select id="set-model">
-          <option value="google/gemini-2.5-flash">Gemini 2.5 Flash (Default)</option>
-          <option value="google/gemini-2.0-flash-lite">Gemini 2.0 Flash Lite</option>
-          <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
-          <option value="meta-llama/llama-3.1-8b-instruct">Llama 3.1 8B</option>
-          <option value="google/gemini-2.0-flash-lite:free">Gemini 2.0 Flash Lite (OpenRouter FREE)</option>
-          <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B (OpenRouter FREE)</option>
-          <option value="deepseek/deepseek-chat:free">DeepSeek Chat (OpenRouter FREE)</option>
-        </select>
-      </div>
-      <div style="border-top:1px dashed var(--border);margin:16px 0 14px;padding-top:14px;">
-        <p style="font-size:0.78rem;font-weight:700;font-family:'Space Grotesk',sans-serif;color:var(--muted);margin-bottom:12px;">Custom Walrus Ledger (Optional)</p>
+
+      <!-- Walrus Ledger Section -->
+      <div style="border:1px solid rgba(16,185,129,0.15);border-radius:var(--r-sm);padding:14px;margin-bottom:14px;background:rgba(16,185,129,0.03);">
+        <p style="font-size:0.7rem;font-weight:700;font-family:'Space Grotesk',sans-serif;color:#34D399;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">🌊 Custom Walrus Ledger</p>
+        <p style="font-size:0.67rem;color:var(--dark);margin-bottom:12px;">Optional. Leave blank to use the shared server ledger. Set your own for a private, dedicated memory store on Walrus/Sui.</p>
         <div class="field">
           <label>Walrus Private Key</label>
           <input type="password" id="set-walrus-key" placeholder="Ed25519 private key…" style="font-family:'JetBrains Mono',monospace;">
@@ -776,9 +800,10 @@
           <input type="text" id="set-walrus-account" placeholder="0x…" style="font-family:'JetBrains Mono',monospace;">
         </div>
       </div>
+
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
         <button onclick="closeModal('settings-modal')" style="padding:9px 14px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:white;border-radius:var(--r-sm);cursor:pointer;font-weight:600;font-size:0.85rem;">Close</button>
-        <button onclick="saveSettings()" style="padding:9px 18px;background:var(--purple);border:none;color:white;border-radius:var(--r-sm);cursor:pointer;font-weight:700;font-size:0.85rem;">Save Keys</button>
+        <button onclick="saveSettings()" style="padding:9px 18px;background:var(--purple);border:none;color:white;border-radius:var(--r-sm);cursor:pointer;font-weight:700;font-size:0.85rem;">Save Settings</button>
       </div>
     </div>
   </div>
@@ -1173,8 +1198,34 @@
       if (m)  document.getElementById('set-model').value = m;
       if (wk) document.getElementById('set-walrus-key').value = wk;
       if (wa) document.getElementById('set-walrus-account').value = wa;
+      updateModelHint();
     }
     loadSettings();
+
+    function updateModelHint() {
+      const sel = document.getElementById('set-model');
+      const hint = document.getElementById('model-hint');
+      if (!sel || !hint) return;
+      const v = sel.value;
+      if (v.startsWith('google/') && !v.includes(':free')) {
+        hint.innerHTML = '✅ Uses your <strong style="color:#34D399">Gemini API Key</strong> above. Free quota via Google AI Studio.';
+      } else if (v.includes(':free')) {
+        hint.innerHTML = '🆓 Requires your <strong style="color:#A78BFA">OpenRouter Key</strong>. Free tier — no credits needed.';
+      } else {
+        hint.innerHTML = '💳 Requires your <strong style="color:#A78BFA">OpenRouter Key</strong> with credits/billing.';
+      }
+    }
+
+    // Add event listener once DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      const sel = document.getElementById('set-model');
+      if (sel) sel.addEventListener('change', updateModelHint);
+    });
+    // Also bind immediately in case DOMContentLoaded already fired
+    (() => {
+      const sel = document.getElementById('set-model');
+      if (sel) sel.addEventListener('change', updateModelHint);
+    })();
 
     function saveSettings() {
       const or = document.getElementById('set-openrouter-key').value.trim();
