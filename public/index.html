@@ -123,17 +123,56 @@
     .pill.purple  { border-color: rgba(139,92,246,0.3); color: #A78BFA; background: rgba(139,92,246,0.06); }
     .pill.amber   { border-color: rgba(245,158,11,0.3); color: #FCD34D; background: rgba(245,158,11,0.06); }
 
+    /* ── HOW IT WORKS STEPS ─────────────────────────────────────────────────── */
+    .how-steps {
+      display: flex; gap: 0; justify-content: center;
+      width: 100%; max-width: 520px; margin-bottom: 36px;
+      animation: landingFadeIn 0.7s 0.2s ease both;
+    }
+    .how-step {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      text-align: center; padding: 0 8px; position: relative;
+    }
+    .how-step:not(:last-child)::after {
+      content: ''; position: absolute;
+      top: 18px; right: -6px;
+      width: 12px; height: 1px;
+      background: var(--border);
+    }
+    .how-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; margin-bottom: 8px; flex-shrink: 0;
+    }
+    .how-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.72rem; font-weight: 700; color: var(--text);
+      margin-bottom: 3px;
+    }
+    .how-desc {
+      font-size: 0.62rem; color: var(--dark); line-height: 1.4;
+    }
+
     .landing-cta-group {
-      display: flex; flex-direction: column; gap: 12px;
-      width: 100%; max-width: 360px;
+      display: flex; flex-direction: column; gap: 10px;
+      width: 100%; max-width: 380px;
       animation: landingFadeIn 0.7s 0.35s ease both;
     }
 
+    .landing-divider {
+      display: flex; align-items: center; gap: 10px;
+      color: var(--dark); font-size: 0.68rem; font-family: 'JetBrains Mono', monospace;
+    }
+    .landing-divider::before, .landing-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
     .landing-btn {
-      width: 100%; padding: 14px 20px;
+      width: 100%; padding: 13px 20px;
       border-radius: var(--r-sm);
       font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700; font-size: 0.95rem;
+      font-weight: 700; font-size: 0.92rem;
       cursor: pointer; border: none;
       display: flex; align-items: center; justify-content: center; gap: 10px;
       transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
@@ -146,18 +185,25 @@
     }
     .landing-btn.google:hover { box-shadow: 0 8px 30px rgba(255,255,255,0.15); }
     .landing-btn.slush {
-      background: rgba(15,23,42,0.8);
-      color: white;
+      background: rgba(15,23,42,0.8); color: white;
       border: 1px solid rgba(59,130,246,0.4);
-      box-shadow: 0 0 0 0 rgba(59,130,246,0);
     }
     .landing-btn.slush:hover {
       border-color: rgba(59,130,246,0.7);
       box-shadow: 0 0 24px rgba(59,130,246,0.2);
     }
+    .landing-btn.guest {
+      background: rgba(255,255,255,0.03); color: var(--muted);
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .landing-btn.guest:hover {
+      background: rgba(255,255,255,0.06); color: var(--text);
+      border-color: var(--border-hi);
+    }
 
     .landing-footer {
-      margin-top: 52px; text-align: center;
+      margin-top: 40px; text-align: center;
       font-size: 0.72rem; color: var(--dark);
       animation: landingFadeIn 0.7s 0.5s ease both;
     }
@@ -474,6 +520,7 @@
     .modal-box {
       background: #0F172A; border: 1px solid var(--border);
       border-radius: var(--r); max-width: 480px; width: 100%;
+      max-height: 90vh; overflow-y: auto;
       padding: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
       position: relative; animation: modalIn 0.25s cubic-bezier(0.16,1,0.3,1);
     }
@@ -567,7 +614,35 @@
       <span class="pill">Sui Network</span>
     </div>
 
+    <!-- HOW IT WORKS -->
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-num">💬</div>
+        <div class="how-label">1. Tanya Oracle</div>
+        <div class="how-desc">Chat dengan AI tentang prediksi &amp; analisis pertandingan</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">🔮</div>
+        <div class="how-label">2. Predict Score</div>
+        <div class="how-desc">Pilih pemenang &amp; prediksi skor, tersimpan di Walrus</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">📡</div>
+        <div class="how-label">3. Lihat Evolusi</div>
+        <div class="how-desc">AI analisis bias &amp; pola prediksimu dari memori on-chain</div>
+      </div>
+    </div>
+
     <div class="landing-cta-group">
+      <!-- Primary: Enter app (guest) -->
+      <button class="landing-btn" id="landing-enter-btn"
+              onclick="enterAsGuest()"
+              style="background:linear-gradient(135deg,#7C3AED,#4F46E5);color:white;font-size:1rem;padding:15px 20px;box-shadow:0 8px 32px rgba(139,92,246,0.35);">
+        🚀 Masuk ke Walruzezzion4
+      </button>
+
+      <div class="landing-divider">atau hubungkan akun</div>
+
       <button class="landing-btn google" onclick="openLoginModal()">
         <svg style="width:18px;height:18px;" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -575,15 +650,19 @@
           <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
         </svg>
-        Continue with Google
+        Masuk dengan Google
       </button>
 
       <button class="landing-btn slush" onclick="openLoginModal('slush')">
         <svg class="slush-icon" viewBox="0 0 21 22" fill="none">
           <path d="M2.20389 17.3658C2.99124 20.3042 5.9321 22.9642 12.0166 21.3339C17.8222 19.7783 21.4606 15.0024 20.5172 11.4814C20.1914 10.2655 19.21 9.44245 17.6971 9.57634L4.1685 10.7035C3.31651 10.7689 2.92585 10.6293 2.70047 10.0924C2.48188 9.58079 2.60644 9.03156 3.63549 8.51148L13.931 3.22789C14.7201 2.8264 15.2457 2.65842 15.726 2.82837C16.027 2.93776 16.2252 3.37334 16.0432 3.91082L15.3757 5.88156C14.5564 8.3002 16.3101 8.86199 17.2988 8.59707C18.7946 8.19628 19.1465 6.77164 18.6646 4.97313C17.4429 0.413541 12.6054 -0.299349 8.21953 0.875847C3.75759 2.07142 -0.110259 5.68703 1.07076 10.0946C1.34904 11.1332 2.30504 11.963 3.41235 11.9378L5.10282 11.9337C5.45046 11.9257 5.32529 11.9543 5.99599 11.8987C6.66668 11.8431 8.45787 11.6227 8.45787 11.6227L17.2472 10.6281L17.4736 10.5952C17.9877 10.5075 18.3761 10.641 18.7046 11.2069C19.1961 12.0535 18.4462 12.692 17.5485 13.4563C17.5245 13.4768 17.5004 13.4973 17.4762 13.518L9.75005 20.1765C8.42577 21.3187 7.49552 20.8892 7.16973 19.6733L6.01586 15.367C5.73079 14.3031 4.69194 13.4683 3.47505 13.7944C1.95393 14.202 1.83058 15.9726 2.20389 17.3658Z" fill="white"/>
         </svg>
-        Connect Slush Wallet
+        Hubungkan Slush Wallet
       </button>
+
+      <p style="font-size:0.67rem;color:var(--dark);text-align:center;line-height:1.5;">
+        🔒 Mode tamu: prediksi disimpan lokal. Hubungkan akun untuk simpan di Walrus on-chain.
+      </p>
     </div>
 
     <div class="landing-footer">
@@ -617,6 +696,24 @@
         <button class="settings-btn" onclick="openModal('settings-modal')" title="Settings">⚙️</button>
       </div>
     </header>
+
+    <!-- GUEST BANNER -->
+    <div id="guest-banner" style="display:none;position:relative;z-index:10;
+         background:rgba(245,158,11,0.08);border-bottom:1px solid rgba(245,158,11,0.2);
+         padding:9px 24px;max-width:780px;width:100%;margin:0 auto;
+         align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <span style="font-size:0.75rem;color:#FCD34D;font-family:'Space Grotesk',sans-serif;font-weight:600;">
+        🔒 Mode Tamu — prediksi disimpan lokal, bukan on-chain.
+      </span>
+      <div style="display:flex;gap:8px;">
+        <button onclick="openLoginModal()" style="padding:5px 12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:white;border-radius:6px;cursor:pointer;font-size:0.72rem;font-weight:700;font-family:'Space Grotesk',sans-serif;transition:all 0.2s;">
+          🔑 Masuk dengan Google
+        </button>
+        <button onclick="openLoginModal('slush')" style="padding:5px 12px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:#60A5FA;border-radius:6px;cursor:pointer;font-size:0.72rem;font-weight:700;font-family:'Space Grotesk',sans-serif;transition:all 0.2s;">
+          ❄️ Slush Wallet
+        </button>
+      </div>
+    </div>
 
     <main>
       <div class="tab-bar">
@@ -883,6 +980,11 @@
           avatar.textContent = 'G';
           avatar.style.background = '#EA4335';
           name.textContent = sess.name || 'Google User';
+        } else if (sess.type === 'guest') {
+          avatar.textContent = '👤';
+          avatar.style.background = 'linear-gradient(135deg,#374151,#6B7280)';
+          avatar.style.fontSize = '0.75rem';
+          name.textContent = 'Mode Tamu';
         } else {
           avatar.textContent = '❄';
           avatar.style.background = 'linear-gradient(135deg,#1D4ED8,#3B82F6)';
@@ -894,12 +996,29 @@
       } else {
         chip.style.display = 'none';
       }
+
+      // Show/hide guest banner
+      const guestBanner = document.getElementById('guest-banner');
+      if (guestBanner) {
+        guestBanner.style.display = (sess?.type === 'guest') ? 'flex' : 'none';
+      }
     }
 
     function doLogout() {
       localStorage.removeItem('wc2026_session');
       toast('Session disconnected', 'success');
       showLanding();
+    }
+
+    function enterAsGuest() {
+      const guestSess = {
+        type: 'guest',
+        name: 'Tamu',
+        address: null
+      };
+      setSession(guestSess);
+      toast('🚀 Selamat datang! Mode tamu aktif.', 'success');
+      showApp();
     }
 
     // Boot: check existing session
@@ -1190,12 +1309,14 @@
     function loadSettings() {
       const or = localStorage.getItem('wc2026_openrouter_key');
       const gk = localStorage.getItem('wc2026_gemini_key');
-      const m  = localStorage.getItem('wc2026_model');
+      const m  = localStorage.getItem('wc2026_model') || 'google/gemini-2.0-flash';
       const wk = localStorage.getItem('wc2026_walrus_key');
       const wa = localStorage.getItem('wc2026_walrus_account');
       if (or) document.getElementById('set-openrouter-key').value = or;
       if (gk) document.getElementById('set-gemini-key').value = gk;
-      if (m)  document.getElementById('set-model').value = m;
+      // Always set model value via JS (not via HTML 'selected' attr to avoid bugs)
+      const modelSel = document.getElementById('set-model');
+      if (modelSel) modelSel.value = m;
       if (wk) document.getElementById('set-walrus-key').value = wk;
       if (wa) document.getElementById('set-walrus-account').value = wa;
       updateModelHint();
