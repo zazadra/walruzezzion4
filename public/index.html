@@ -761,7 +761,7 @@
         <p class="landing-sub">
           Query prediction biases, lock score forecasts on-chain, and watch your fan profile evolve. Powered by Walrus Memory.
         </p>
-        <button class="landing-btn primary-cta" onclick="openLoginModal()">
+        <button class="landing-btn primary-cta" onclick="handleEnterButton()">
           🚀 Enter Walruzezzion4
         </button>
       </div>
@@ -833,7 +833,7 @@
   ════════════════════════════════════════════════════ -->
   <div id="app">
     <header>
-      <div class="brand">
+      <div class="brand" onclick="showLanding()" style="cursor:pointer;" title="Go to landing page">
         <h1>Walruzezzion4 ⚽</h1>
         <span>World Cup AI Oracle</span>
       </div>
@@ -1186,7 +1186,16 @@
     function doLogout() {
       localStorage.removeItem('wc2026_session');
       toast('Session disconnected', 'success');
-      showLanding();
+      updateUserChip();
+      openLoginModal();
+    }
+
+    function handleEnterButton() {
+      if (getSession()) {
+        showApp();
+      } else {
+        openLoginModal();
+      }
     }
 
     function enterAsGuest() {
