@@ -74,140 +74,227 @@
     #landing {
       position: relative; z-index: 10;
       min-height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0;
+      background: radial-gradient(circle at top, rgba(139,92,246,0.03) 0%, transparent 60%);
     }
     #landing.hidden { display: none; }
 
+    .landing-container {
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 80px 24px 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 70px;
+      align-items: center;
+    }
+
+    .landing-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 650px;
+      animation: landingFadeIn 0.8s ease both;
+    }
+
     .landing-logo {
-      font-size: 3rem; margin-bottom: 20px;
+      font-size: 3.5rem; margin-bottom: 24px;
       animation: ballBounce 2.5s ease-in-out infinite;
-      filter: drop-shadow(0 0 20px rgba(139,92,246,0.5));
+      filter: drop-shadow(0 0 20px rgba(139,92,246,0.4));
     }
 
     .landing-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-size: clamp(2.2rem, 7vw, 3.8rem);
       font-weight: 800;
       letter-spacing: -0.03em;
       text-align: center;
-      line-height: 1.1;
-      background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.6) 100%);
+      line-height: 1.05;
+      background: linear-gradient(135deg, #ffffff 10%, rgba(255,255,255,0.7) 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      animation: landingFadeIn 0.7s ease both;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
     .landing-sub {
-      font-size: 1rem; color: var(--muted);
-      text-align: center; max-width: 420px;
+      font-size: 1.08rem; color: var(--muted);
+      text-align: center;
       line-height: 1.6;
-      animation: landingFadeIn 0.7s 0.15s ease both;
-      margin-bottom: 40px;
-    }
-
-    .landing-pills {
-      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
       margin-bottom: 44px;
-      animation: landingFadeIn 0.7s 0.25s ease both;
     }
 
-    .pill {
-      font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;
-      padding: 5px 12px; border-radius: 100px;
-      border: 1px solid var(--border);
-      color: var(--dark);
+    /* Giant primary CTA */
+    .landing-btn.primary-cta {
+      background: linear-gradient(135deg, #7C3AED, #4F46E5);
+      color: white;
+      font-size: 1.1rem;
+      padding: 16px 36px;
+      border-radius: var(--r);
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 35px rgba(139,92,246,0.4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
     }
-    .pill.emerald { border-color: rgba(16,185,129,0.3); color: #34D399; background: rgba(16,185,129,0.06); }
-    .pill.purple  { border-color: rgba(139,92,246,0.3); color: #A78BFA; background: rgba(139,92,246,0.06); }
-    .pill.amber   { border-color: rgba(245,158,11,0.3); color: #FCD34D; background: rgba(245,158,11,0.06); }
+    .landing-btn.primary-cta:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 40px rgba(139,92,246,0.6);
+      border-color: rgba(255,255,255,0.2);
+    }
+    .landing-btn.primary-cta:active {
+      transform: translateY(-1px);
+    }
 
-    /* ── HOW IT WORKS STEPS ─────────────────────────────────────────────────── */
-    .how-steps {
-      display: flex; gap: 0; justify-content: center;
-      width: 100%; max-width: 520px; margin-bottom: 36px;
-      animation: landingFadeIn 0.7s 0.2s ease both;
+    /* Sections */
+    .landing-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      animation: landingFadeIn 0.8s 0.2s ease both;
     }
-    .how-step {
-      flex: 1; display: flex; flex-direction: column; align-items: center;
-      text-align: center; padding: 0 8px; position: relative;
-    }
-    .how-step:not(:last-child)::after {
-      content: ''; position: absolute;
-      top: 18px; right: -6px;
-      width: 12px; height: 1px;
-      background: var(--border);
-    }
-    .how-num {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.3);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; margin-bottom: 8px; flex-shrink: 0;
-    }
-    .how-label {
+
+    .landing-section-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.72rem; font-weight: 700; color: var(--text);
-      margin-bottom: 3px;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: white;
+      text-align: center;
+      letter-spacing: -0.01em;
+      position: relative;
+      padding-bottom: 12px;
     }
-    .how-desc {
-      font-size: 0.62rem; color: var(--dark); line-height: 1.4;
-    }
-
-    .landing-cta-group {
-      display: flex; flex-direction: column; gap: 10px;
-      width: 100%; max-width: 380px;
-      animation: landingFadeIn 0.7s 0.35s ease both;
-    }
-
-    .landing-divider {
-      display: flex; align-items: center; gap: 10px;
-      color: var(--dark); font-size: 0.68rem; font-family: 'JetBrains Mono', monospace;
-    }
-    .landing-divider::before, .landing-divider::after {
-      content: ''; flex: 1; height: 1px; background: var(--border);
+    .landing-section-title::after {
+      content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 50px; height: 3px; background: var(--purple); border-radius: 100px;
     }
 
-    .landing-btn {
-      width: 100%; padding: 13px 20px;
-      border-radius: var(--r-sm);
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700; font-size: 0.92rem;
-      cursor: pointer; border: none;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+    /* Guide Grid */
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      width: 100%;
     }
-    .landing-btn:hover { transform: translateY(-2px); }
-    .landing-btn:active { transform: translateY(0); }
-    .landing-btn.google {
-      background: #fff; color: #1F2937;
-      box-shadow: 0 4px 20px rgba(255,255,255,0.1);
-    }
-    .landing-btn.google:hover { box-shadow: 0 8px 30px rgba(255,255,255,0.15); }
-    .landing-btn.slush {
-      background: rgba(15,23,42,0.8); color: white;
-      border: 1px solid rgba(59,130,246,0.4);
-    }
-    .landing-btn.slush:hover {
-      border-color: rgba(59,130,246,0.7);
-      box-shadow: 0 0 24px rgba(59,130,246,0.2);
-    }
-    .landing-btn.guest {
-      background: rgba(255,255,255,0.03); color: var(--muted);
+    .guide-card {
+      background: var(--card);
       border: 1px solid var(--border);
-      font-size: 0.85rem;
+      border-radius: var(--r);
+      padding: 30px 24px;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
-    .landing-btn.guest:hover {
-      background: rgba(255,255,255,0.06); color: var(--text);
+    .guide-card:hover {
+      transform: translateY(-4px);
       border-color: var(--border-hi);
+      background: var(--card-hi);
+    }
+    .guide-icon {
+      font-size: 1.5rem;
+      width: 44px; height: 44px;
+      background: rgba(139,92,246,0.1);
+      border: 1px solid rgba(139,92,246,0.25);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .guide-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem; font-weight: 700; color: white;
+    }
+    .guide-card p {
+      font-size: 0.85rem; color: var(--muted); line-height: 1.55;
+    }
+
+    /* Comparison Grid */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+      width: 100%;
+    }
+    .comparison-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: relative;
+      transition: all 0.3s;
+    }
+    .comparison-card.recommended {
+      border-color: rgba(139,92,246,0.3);
+      background: rgba(139,92,246,0.01);
+      box-shadow: 0 10px 40px rgba(139,92,246,0.05);
+    }
+    .comparison-card.recommended:hover {
+      border-color: rgba(139,92,246,0.5);
+      box-shadow: 0 15px 50px rgba(139,92,246,0.1);
+    }
+    .comparison-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-hi);
+    }
+    .comparison-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .comparison-header h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem; font-weight: 750; color: white;
+    }
+    .comparison-header .badge {
+      align-self: flex-start;
+      background: var(--purple);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 8px;
+      border-radius: 100px;
+    }
+    .comparison-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .comparison-list li {
+      font-size: 0.85rem; color: var(--muted);
+      line-height: 1.5;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .comparison-list li span {
+      font-weight: bold;
+      color: var(--emerald);
+      flex-shrink: 0;
     }
 
     .landing-footer {
-      margin-top: 40px; text-align: center;
-      font-size: 0.72rem; color: var(--dark);
-      animation: landingFadeIn 0.7s 0.5s ease both;
+      margin-top: 20px; text-align: center;
+      font-size: 0.75rem; color: var(--dark);
+      animation: landingFadeIn 0.8s 0.4s ease both;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
     }
-    .landing-footer a { color: var(--muted); text-decoration: none; }
+    .landing-footer a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
     .landing-footer a:hover { color: var(--text); }
 
     /* Walrus badge on landing */
@@ -217,8 +304,77 @@
       color: var(--dark);
       background: rgba(255,255,255,0.02);
       border: 1px solid var(--border);
-      padding: 4px 10px; border-radius: 100px;
-      margin-top: 8px;
+      padding: 4px 12px; border-radius: 100px;
+    }
+
+    /* Modal Select Cards Layout */
+    .login-options-wrap {
+      display: flex; flex-direction: column; gap: 12px; text-align: left;
+    }
+    .login-option-card {
+      background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 14px; cursor: pointer;
+      display: flex; gap: 12px; align-items: flex-start;
+      transition: all 0.2s ease-in-out;
+    }
+    .login-option-card:hover {
+      background: rgba(255,255,255,0.05); border-color: rgba(139,92,246,0.3);
+      transform: translateY(-1px);
+    }
+    .login-option-card.slush:hover {
+      border-color: rgba(59,130,246,0.3);
+    }
+    .login-option-card.guest:hover {
+      border-color: rgba(16,185,129,0.3);
+    }
+    .login-option-icon {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+      font-size: 0.95rem;
+    }
+    .login-option-icon.google { background: white; }
+    .login-option-icon.slush { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); }
+    .login-option-icon.guest { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); }
+    .login-option-title { font-weight: 700; color: white; font-size: 0.88rem; margin-bottom: 2px; }
+    .login-option-desc { font-size: 0.72rem; color: var(--muted); line-height: 1.3; }
+
+    /* ── RESPONSIVENESS MEDIA QUERIES ── */
+    @media (max-width: 600px) {
+      .landing-container {
+        padding: 50px 16px 60px;
+        gap: 50px;
+      }
+      .landing-hero {
+        max-width: 100%;
+      }
+      .landing-title {
+        margin-bottom: 16px;
+      }
+      .landing-sub {
+        font-size: 0.95rem;
+        margin-bottom: 32px;
+      }
+      .landing-btn.primary-cta {
+        width: 100%;
+        justify-content: center;
+        padding: 14px 24px;
+        font-size: 1rem;
+      }
+      .comparison-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .guide-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .guide-card {
+        padding: 24px 20px;
+      }
+      .comparison-card {
+        padding: 24px 20px;
+      }
     }
 
     /* ══ APP SHELL (shown after login) ══════════════════════════════════════ */
@@ -598,71 +754,76 @@
        LANDING PAGE
   ════════════════════════════════════════════════════ -->
   <div id="landing">
-    <div class="landing-logo">⚽</div>
-
-    <h1 class="landing-title">Your World Cup<br>AI Oracle</h1>
-
-    <p class="landing-sub">
-      Chat with The Oracle, predict match scores, and track your fan evolution —
-      all powered by Walrus Memory on Sui.
-    </p>
-
-    <!-- HOW IT WORKS -->
-    <div class="how-steps">
-      <div class="how-step">
-        <div class="how-num">💬</div>
-        <div class="how-label">1. Ask The Oracle</div>
-        <div class="how-desc">Chat with AI about match predictions &amp; analysis</div>
+    <div class="landing-container">
+      <div class="landing-hero">
+        <div class="landing-logo">⚽</div>
+        <h1 class="landing-title">Your World Cup<br>AI Oracle</h1>
+        <p class="landing-sub">
+          Query prediction biases, lock score forecasts on-chain, and watch your fan profile evolve. Powered by Walrus Memory.
+        </p>
+        <button class="landing-btn primary-cta" onclick="openLoginModal()">
+          🚀 Enter Walruzezzion4
+        </button>
       </div>
-      <div class="how-step">
-        <div class="how-num">🔮</div>
-        <div class="how-label">2. Predict Scores</div>
-        <div class="how-desc">Pick winners &amp; lock score predictions on Walrus</div>
+
+      <!-- GUIDES & TUTORIALS -->
+      <div class="landing-section">
+        <h2 class="landing-section-title">🔮 Guide to the Oracle</h2>
+        <div class="guide-grid">
+          <div class="guide-card">
+            <div class="guide-icon">💬</div>
+            <h3>1. Query the Oracle</h3>
+            <p>Engage in real-time strategic chats about World Cup matchups. The Oracle queries your locked prediction history to reveal your regional biases.</p>
+          </div>
+          <div class="guide-card">
+            <div class="guide-icon">🔮</div>
+            <h3>2. Lock Prediction Scores</h3>
+            <p>Commit your exact scores and team winners before kickoff. Every match prediction creates an immutable, verifiable ledger log.</p>
+          </div>
+          <div class="guide-card">
+            <div class="guide-icon">📡</div>
+            <h3>3. Evolve Your Profile</h3>
+            <p>Visit the "Signals" tab. The AI analyzes your completed prediction ledger stored in Walrus Memory to dynamically compute your fan profile.</p>
+          </div>
+        </div>
       </div>
-      <div class="how-step">
-        <div class="how-num">📡</div>
-        <div class="how-label">3. Track Evolution</div>
-        <div class="how-desc">AI analyzes your bias &amp; patterns from on-chain memory</div>
+
+      <!-- COMPARISON -->
+      <div class="landing-section">
+        <h2 class="landing-section-title">🌊 Walrus Storage Modes</h2>
+        <div class="comparison-grid">
+          <div class="comparison-card recommended">
+            <div class="comparison-header">
+              <span class="badge">Recommended</span>
+              <h3>🔗 On-Chain Walrus Ledger</h3>
+            </div>
+            <ul class="comparison-list">
+              <li><span>✓</span> Securely logs all chat memories and prediction score vectors</li>
+              <li><span>✓</span> Accessible from any device using zkLogin (Google) or Slush Wallet</li>
+              <li><span>✓</span> Creates a permanent, decentralized identity on Sui</li>
+              <li><span>✓</span> Requires a Gemini API key in Settings for direct, limitless queries</li>
+            </ul>
+          </div>
+          <div class="comparison-card">
+            <div class="comparison-header">
+              <h3>🔒 Local Guest Session</h3>
+            </div>
+            <ul class="comparison-list">
+              <li><span>✓</span> Instant setup: no login or wallet authorization needed</li>
+              <li><span>✓</span> Predictions are stored locally in your browser's local storage</li>
+              <li><span>✓</span> Perfect for quick match simulations and local tests</li>
+              <li><span style="color:var(--amber)">⚠</span> Clearing browser cache will reset all predictions and logs</li>
+            </ul>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="landing-cta-group">
-      <!-- Primary CTA -->
-      <button class="landing-btn" id="landing-enter-btn"
-              onclick="enterAsGuest()"
-              style="background:linear-gradient(135deg,#7C3AED,#4F46E5);color:white;font-size:1rem;padding:15px 20px;box-shadow:0 8px 32px rgba(139,92,246,0.35);">
-        🚀 Enter Walruzezzion4
-      </button>
-
-      <div class="landing-divider">or sign in to save on-chain</div>
-
-      <button class="landing-btn google" onclick="openLoginModal('google')">
-        <svg style="width:18px;height:18px;" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-        </svg>
-        Continue with Google
-      </button>
-
-      <button class="landing-btn slush" onclick="openLoginModal('slush')">
-        <svg class="slush-icon" viewBox="0 0 21 22" fill="none">
-          <path d="M2.20389 17.3658C2.99124 20.3042 5.9321 22.9642 12.0166 21.3339C17.8222 19.7783 21.4606 15.0024 20.5172 11.4814C20.1914 10.2655 19.21 9.44245 17.6971 9.57634L4.1685 10.7035C3.31651 10.7689 2.92585 10.6293 2.70047 10.0924C2.48188 9.58079 2.60644 9.03156 3.63549 8.51148L13.931 3.22789C14.7201 2.8264 15.2457 2.65842 15.726 2.82837C16.027 2.93776 16.2252 3.37334 16.0432 3.91082L15.3757 5.88156C14.5564 8.3002 16.3101 8.86199 17.2988 8.59707C18.7946 8.19628 19.1465 6.77164 18.6646 4.97313C17.4429 0.413541 12.6054 -0.299349 8.21953 0.875847C3.75759 2.07142 -0.110259 5.68703 1.07076 10.0946C1.34904 11.1332 2.30504 11.963 3.41235 11.9378L5.10282 11.9337C5.45046 11.9257 5.32529 11.9543 5.99599 11.8987C6.66668 11.8431 8.45787 11.6227 8.45787 11.6227L17.2472 10.6281L17.4736 10.5952C17.9877 10.5075 18.3761 10.641 18.7046 11.2069C19.1961 12.0535 18.4462 12.692 17.5485 13.4563C17.5245 13.4768 17.5004 13.4973 17.4762 13.518L9.75005 20.1765C8.42577 21.3187 7.49552 20.8892 7.16973 19.6733L6.01586 15.367C5.73079 14.3031 4.69194 13.4683 3.47505 13.7944C1.95393 14.202 1.83058 15.9726 2.20389 17.3658Z" fill="white"/>
-        </svg>
-        Connect Slush Wallet
-      </button>
-
-      <p style="font-size:0.67rem;color:var(--dark);text-align:center;line-height:1.5;">
-        🔒 Guest mode: predictions saved locally. Sign in to store on Walrus on-chain.
-      </p>
-    </div>
-
-    <div class="landing-footer">
-      <div>Powered by <a href="https://www.walrus.xyz/" target="_blank">Walrus Protocol</a> · <a href="https://sui.io/" target="_blank">Sui Network</a></div>
-      <div class="walrus-badge">
-        <span style="color:#34D399">●</span>
-        Walrus Mainnet · Memory Ledger Active
+      <div class="landing-footer">
+        <div>Powered by <a href="https://www.walrus.xyz/" target="_blank">Walrus Protocol</a> · <a href="https://sui.io/" target="_blank">Sui Network</a></div>
+        <div class="walrus-badge">
+          <span style="color:#34D399">●</span>
+          Walrus Mainnet · Memory Ledger Active
+        </div>
       </div>
     </div>
   </div>
@@ -774,29 +935,50 @@
 
   <!-- LOGIN MODAL -->
   <div class="modal-bg" id="login-modal">
-    <div class="modal-box login-box">
+    <div class="modal-box login-box" style="max-width: 440px;">
       <button class="modal-close" onclick="closeModal('login-modal')">✕</button>
-      <div class="login-title">Connect Session</div>
-      <p class="login-sub">Access your isolated prediction history and personalized AI profile.</p>
+      <div class="login-title">Choose Session</div>
+      <p class="login-sub" style="margin-bottom: 20px;">Select how you want to access your World Cup Oracle session.</p>
 
-      <!-- Google -->
-      <button class="auth-btn google" onclick="startGoogleLogin()">
-        <svg style="width:18px;height:18px;" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-        </svg>
-        Sign in with Google
-      </button>
+      <div class="login-options-wrap">
+        <!-- Google zkLogin -->
+        <div class="login-option-card" onclick="startGoogleLogin()">
+          <div class="login-option-icon google">
+            <svg style="width:16px;height:16px;" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="login-option-title">Continue with Google</div>
+            <div class="login-option-desc">Sui zkLogin. Secure on-chain storage with no wallet extension needed.</div>
+          </div>
+        </div>
 
-      <!-- Slush Wallet -->
-      <button class="auth-btn slush" onclick="startSlushLogin()">
-        <svg class="slush-icon" viewBox="0 0 21 22" fill="none">
-          <path d="M2.20389 17.3658C2.99124 20.3042 5.9321 22.9642 12.0166 21.3339C17.8222 19.7783 21.4606 15.0024 20.5172 11.4814C20.1914 10.2655 19.21 9.44245 17.6971 9.57634L4.1685 10.7035C3.31651 10.7689 2.92585 10.6293 2.70047 10.0924C2.48188 9.58079 2.60644 9.03156 3.63549 8.51148L13.931 3.22789C14.7201 2.8264 15.2457 2.65842 15.726 2.82837C16.027 2.93776 16.2252 3.37334 16.0432 3.91082L15.3757 5.88156C14.5564 8.3002 16.3101 8.86199 17.2988 8.59707C18.7946 8.19628 19.1465 6.77164 18.6646 4.97313C17.4429 0.413541 12.6054 -0.299349 8.21953 0.875847C3.75759 2.07142 -0.110259 5.68703 1.07076 10.0946C1.34904 11.1332 2.30504 11.963 3.41235 11.9378L5.10282 11.9337C5.45046 11.9257 5.32529 11.9543 5.99599 11.8987C6.66668 11.8431 8.45787 11.6227 8.45787 11.6227L17.2472 10.6281L17.4736 10.5952C17.9877 10.5075 18.3761 10.641 18.7046 11.2069C19.1961 12.0535 18.4462 12.692 17.5485 13.4563C17.5245 13.4768 17.5004 13.4973 17.4762 13.518L9.75005 20.1765C8.42577 21.3187 7.49552 20.8892 7.16973 19.6733L6.01586 15.367C5.73079 14.3031 4.69194 13.4683 3.47505 13.7944C1.95393 14.202 1.83058 15.9726 2.20389 17.3658Z" fill="#3B82F6"/>
-        </svg>
-        Connect Slush Wallet
-      </button>
+        <!-- Slush Wallet -->
+        <div class="login-option-card slush" onclick="startSlushLogin()">
+          <div class="login-option-icon slush">
+            <svg class="slush-icon" style="width:18px;height:18px;" viewBox="0 0 21 22" fill="none">
+              <path d="M2.20389 17.3658C2.99124 20.3042 5.9321 22.9642 12.0166 21.3339C17.8222 19.7783 21.4606 15.0024 20.5172 11.4814C20.1914 10.2655 19.21 9.44245 17.6971 9.57634L4.1685 10.7035C3.31651 10.7689 2.92585 10.6293 2.70047 10.0924C2.48188 9.58079 2.60644 9.03156 3.63549 8.51148L13.931 3.22789C14.7201 2.8264 15.2457 2.65842 15.726 2.82837C16.027 2.93776 16.2252 3.37334 16.0432 3.91082L15.3757 5.88156C14.5564 8.3002 16.3101 8.86199 17.2988 8.59707C18.7946 8.19628 19.1465 6.77164 18.6646 4.97313C17.4429 0.413541 12.6054 -0.299349 8.21953 0.875847C3.75759 2.07142 -0.110259 5.68703 1.07076 10.0946C1.34904 11.1332 2.30504 11.963 3.41235 11.9378L5.10282 11.9337C5.45046 11.9257 5.32529 11.9543 5.99599 11.8987C6.66668 11.8431 8.45787 11.6227 8.45787 11.6227L17.2472 10.6281L17.4736 10.5952C17.9877 10.5075 18.3761 10.641 18.7046 11.2069C19.1961 12.0535 18.4462 12.692 17.5485 13.4563C17.5245 13.4768 17.5004 13.4973 17.4762 13.518L9.75005 20.1765C8.42577 21.3187 7.49552 20.8892 7.16973 19.6733L6.01586 15.367C5.73079 14.3031 4.69194 13.4683 3.47505 13.7944C1.95393 14.202 1.83058 15.9726 2.20389 17.3658Z" fill="#3B82F6"/>
+            </svg>
+          </div>
+          <div>
+            <div class="login-option-title">Connect Slush Wallet</div>
+            <div class="login-option-desc">Sui browser extension. Connect directly using Slush or any standard Sui wallet.</div>
+          </div>
+        </div>
+
+        <!-- Guest Mode -->
+        <div class="login-option-card guest" onclick="enterAsGuest()">
+          <div class="login-option-icon guest">👤</div>
+          <div>
+            <div class="login-option-title">Explore as Guest</div>
+            <div class="login-option-desc">Local storage. Explore the app and save predictions locally on this browser.</div>
+          </div>
+        </div>
+      </div>
 
       <!-- Slush loader overlay -->
       <div class="overlay-pane" id="slush-loader">
