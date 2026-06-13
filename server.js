@@ -382,33 +382,55 @@ const fallbackMatches = [
     date: "2026-06-11T19:00Z",
     name: "South Africa at Mexico",
     shortName: "RSA @ MEX",
-    status: "STATUS_SCHEDULED",
-    state: "pre",
-    statusDetail: "Thu, June 11th at 3:00 PM EDT",
-    home: { name: "Mexico", shortName: "MEX", logo: "https://a.espncdn.com/i/teamlogos/countries/500/mex.png", score: "0" },
-    away: { name: "South Africa", shortName: "RSA", logo: "https://a.espncdn.com/i/teamlogos/countries/500/rsa.png", score: "0" }
+    status: "STATUS_FINAL",
+    state: "post",
+    statusDetail: "Final",
+    home: { name: "Mexico", shortName: "MEX", logo: "https://a.espncdn.com/i/teamlogos/countries/500/mex.png", score: "1" },
+    away: { name: "South Africa", shortName: "RSA", logo: "https://a.espncdn.com/i/teamlogos/countries/500/rsa.png", score: "1" }
   },
   {
     id: "760416",
     date: "2026-06-12T16:00Z",
-    name: "Canada vs Morocco",
-    shortName: "CAN vs MAR",
-    status: "STATUS_SCHEDULED",
-    state: "pre",
-    statusDetail: "Fri, June 12th at 12:00 PM EDT",
-    home: { name: "Canada", shortName: "CAN", logo: "https://a.espncdn.com/i/teamlogos/countries/500/can.png", score: "0" },
-    away: { name: "Morocco", shortName: "MAR", logo: "https://a.espncdn.com/i/teamlogos/countries/500/mar.png", score: "0" }
+    name: "Morocco vs Canada",
+    shortName: "MAR vs CAN",
+    status: "STATUS_FINAL",
+    state: "post",
+    statusDetail: "Final",
+    home: { name: "Canada", shortName: "CAN", logo: "https://a.espncdn.com/i/teamlogos/countries/500/can.png", score: "2" },
+    away: { name: "Morocco", shortName: "MAR", logo: "https://a.espncdn.com/i/teamlogos/countries/500/mar.png", score: "1" }
   },
   {
     id: "760417",
     date: "2026-06-12T20:00Z",
-    name: "United States vs Spain",
-    shortName: "USA vs ESP",
+    name: "Spain vs United States",
+    shortName: "ESP vs USA",
+    status: "STATUS_FINAL",
+    state: "post",
+    statusDetail: "Final",
+    home: { name: "United States", shortName: "USA", logo: "https://a.espncdn.com/i/teamlogos/countries/500/usa.png", score: "0" },
+    away: { name: "Spain", shortName: "ESP", logo: "https://a.espncdn.com/i/teamlogos/countries/500/esp.png", score: "3" }
+  },
+  {
+    id: "760418",
+    date: "2026-06-14T18:00Z",
+    name: "Germany at Brazil",
+    shortName: "GER @ BRA",
     status: "STATUS_SCHEDULED",
     state: "pre",
-    statusDetail: "Fri, June 12th at 4:00 PM EDT",
-    home: { name: "United States", shortName: "USA", logo: "https://a.espncdn.com/i/teamlogos/countries/500/usa.png", score: "0" },
-    away: { name: "Spain", shortName: "ESP", logo: "https://a.espncdn.com/i/teamlogos/countries/500/esp.png", score: "0" }
+    statusDetail: "Sun, June 14th at 2:00 PM EDT",
+    home: { name: "Brazil", shortName: "BRA", logo: "https://a.espncdn.com/i/teamlogos/countries/500/bra.png", score: "0" },
+    away: { name: "Germany", shortName: "GER", logo: "https://a.espncdn.com/i/teamlogos/countries/500/ger.png", score: "0" }
+  },
+  {
+    id: "760419",
+    date: "2026-06-15T20:00Z",
+    name: "France vs Argentina",
+    shortName: "FRA vs ARG",
+    status: "STATUS_SCHEDULED",
+    state: "pre",
+    statusDetail: "Mon, June 15th at 4:00 PM EDT",
+    home: { name: "Argentina", shortName: "ARG", logo: "https://a.espncdn.com/i/teamlogos/countries/500/arg.png", score: "0" },
+    away: { name: "France", shortName: "FRA", logo: "https://a.espncdn.com/i/teamlogos/countries/500/fra.png", score: "0" }
   }
 ];
 
