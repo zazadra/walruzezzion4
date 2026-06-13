@@ -333,7 +333,6 @@
       flex-shrink: 0; margin-top: 2px;
       font-size: 0.95rem;
     }
-    .login-option-icon.google { background: white; }
     .login-option-icon.slush { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); }
     .login-option-icon.guest { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); }
     .login-option-title { font-weight: 700; color: white; font-size: 0.88rem; margin-bottom: 2px; }
@@ -705,7 +704,6 @@
       transition: all 0.2s cubic-bezier(0.16,1,0.3,1); margin-bottom: 10px;
     }
     .auth-btn:hover { transform: translateY(-1px); }
-    .auth-btn.google { background: #FFF; color: #1F2937; border: none; box-shadow: 0 4px 12px rgba(255,255,255,0.12); }
     .auth-btn.slush {
       background: rgba(255,255,255,0.03); color: white;
       border: 1px solid rgba(59,130,246,0.35);
@@ -799,7 +797,7 @@
             </div>
             <ul class="comparison-list">
               <li><span>✓</span> Securely logs all chat memories and prediction score vectors</li>
-              <li><span>✓</span> Accessible from any device using zkLogin (Google) or Slush Wallet</li>
+              <li><span>✓</span> Accessible from any device using Slush Wallet</li>
               <li><span>✓</span> Creates a permanent, decentralized identity on Sui</li>
               <li><span>✓</span> Requires a Gemini API key in Settings for direct, limitless queries</li>
             </ul>
@@ -860,9 +858,6 @@
         🔒 Guest Mode — predictions saved locally, not on-chain.
       </span>
       <div style="display:flex;gap:8px;">
-        <button onclick="openLoginModal('google')" style="padding:5px 12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:white;border-radius:6px;cursor:pointer;font-size:0.72rem;font-weight:700;font-family:'Space Grotesk',sans-serif;transition:all 0.2s;">
-          🔑 Sign in with Google
-        </button>
         <button onclick="openLoginModal('slush')" style="padding:5px 12px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:#60A5FA;border-radius:6px;cursor:pointer;font-size:0.72rem;font-weight:700;font-family:'Space Grotesk',sans-serif;transition:all 0.2s;">
           ❄️ Slush Wallet
         </button>
@@ -941,22 +936,6 @@
       <p class="login-sub" style="margin-bottom: 20px;">Select how you want to access your World Cup Oracle session.</p>
 
       <div class="login-options-wrap">
-        <!-- Google zkLogin -->
-        <div class="login-option-card" onclick="startGoogleLogin()">
-          <div class="login-option-icon google">
-            <svg style="width:16px;height:16px;" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-            </svg>
-          </div>
-          <div>
-            <div class="login-option-title">Continue with Google</div>
-            <div class="login-option-desc">Sui zkLogin. Secure on-chain storage with no wallet extension needed.</div>
-          </div>
-        </div>
-
         <!-- Slush Wallet -->
         <div class="login-option-card slush" onclick="startSlushLogin()">
           <div class="login-option-icon slush">
@@ -986,34 +965,6 @@
         <div id="slush-wallet-status" style="font-size:0.76rem;color:var(--muted);text-align:center;max-width:90%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;"></div>
       </div>
 
-      <!-- Google picker overlay -->
-      <div class="overlay-pane" id="google-picker">
-        <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1rem;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-          <svg style="width:16px;height:16px;" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-          </svg>
-          Google Sign-in
-        </h3>
-        <p style="font-size:0.76rem;color:var(--muted);margin-bottom:18px;">Enter your email to derive a Sui session address.</p>
-        <div class="field" style="width:100%;text-align:left;">
-          <label>Google Email</label>
-          <input type="email" id="google-email" placeholder="you@gmail.com">
-        </div>
-        <div style="display:flex;gap:8px;width:100%;">
-          <button onclick="cancelGooglePicker()" style="flex:1;padding:9px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:white;border-radius:var(--r-sm);cursor:pointer;font-weight:600;font-size:0.8rem;">Back</button>
-          <button onclick="submitGoogleEmail()" style="flex:1;padding:9px;background:var(--purple);border:none;color:white;border-radius:var(--r-sm);cursor:pointer;font-weight:700;font-size:0.8rem;">Continue</button>
-        </div>
-      </div>
-
-      <!-- Google loader overlay -->
-      <div class="overlay-pane" id="google-loader">
-        <div class="spin" style="width:32px;height:32px;border-top-color:var(--purple);margin-bottom:16px;"></div>
-        <h4 id="loader-title" style="font-family:'Space Grotesk',sans-serif;font-size:0.92rem;font-weight:700;margin-bottom:5px;">Requesting token…</h4>
-        <p id="loader-desc" style="font-size:0.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace;text-align:center;max-width:90%;">Contacting servers…</p>
-      </div>
     </div>
   </div>
 
@@ -1155,11 +1106,7 @@
       const name = document.getElementById('user-name');
       if (sess) {
         chip.style.display = 'flex';
-        if (sess.type === 'google') {
-          avatar.textContent = 'G';
-          avatar.style.background = '#EA4335';
-          name.textContent = sess.name || 'Google User';
-        } else if (sess.type === 'guest') {
+        if (sess.type === 'guest') {
           avatar.textContent = '👤';
           avatar.style.background = 'linear-gradient(135deg,#374151,#6B7280)';
           avatar.style.fontSize = '0.75rem';
@@ -1219,18 +1166,13 @@
     function closeModal(id) {
       document.getElementById(id).classList.remove('open');
       if (id === 'login-modal') {
-        document.getElementById('google-picker').classList.remove('show');
-        document.getElementById('google-loader').classList.remove('show');
         document.getElementById('slush-loader').classList.remove('show');
-        const em = document.getElementById('google-email');
-        if (em) em.value = '';
       }
     }
 
     function openLoginModal(hint) {
       openModal('login-modal');
       if (hint === 'slush') setTimeout(startSlushLogin, 50);
-      if (hint === 'google') setTimeout(startGoogleLogin, 50);
     }
 
     // ── STATUS CHECK ─────────────────────────────────────────────────────────
@@ -1586,46 +1528,6 @@
     }
     checkLegacyWallets();
 
-    // ── GOOGLE LOGIN ──────────────────────────────────────────────────────────
-    function startGoogleLogin() {
-      document.getElementById('google-picker').classList.add('show');
-      document.getElementById('google-email').focus();
-    }
-    function cancelGooglePicker() {
-      document.getElementById('google-picker').classList.remove('show');
-    }
-
-    async function deriveAddress(email) {
-      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email.toLowerCase().trim()));
-      return '0x' + Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('').slice(0,40);
-    }
-
-    async function submitGoogleEmail() {
-      const email = document.getElementById('google-email').value.trim();
-      if (!email || !email.includes('@')) { toast('Enter a valid email', 'error'); return; }
-
-      const loader = document.getElementById('google-loader');
-      const title  = document.getElementById('loader-title');
-      const desc   = document.getElementById('loader-desc');
-      loader.classList.add('show');
-      document.getElementById('google-picker').classList.remove('show');
-
-      const steps = [
-        ['Generating zkLogin Key Pair…', 'Creating ephemeral credentials…', 1400],
-        ['Requesting Zero-Knowledge Proof…', 'Sending proof to decentralized prover…', 1400],
-        ['Deriving zkLogin Address…', 'Computing Sui address from JWT…', 1000],
-      ];
-      for (const [t, d, delay] of steps) {
-        title.textContent = t; desc.textContent = d;
-        await new Promise(r => setTimeout(r, delay));
-      }
-
-      const address = await deriveAddress(email);
-      desc.textContent = 'Address: ' + address.slice(0,8) + '…' + address.slice(-6);
-      await new Promise(r => setTimeout(r, 800));
-
-      loginSuccess({ type: 'google', email, address, name: email.split('@')[0] });
-    }
 
     // ── SLUSH WALLET LOGIN ────────────────────────────────────────────────────
     function cancelSlushLogin() {
